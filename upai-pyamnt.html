@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>aupiipymentt</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    .upi-box {
+      max-width: 400px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .upi-box h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .upi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .upi-option {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+    }
+
+    .upi-option:hover {
+      background: #e0f0ff;
+      border-color: #4d90fe;
+    }
+
+    .upi-option img {
+      max-height: 30px;
+      max-width: 80px;
+    }
+
+    .other-upi-btn {
+      margin-top: 10px;
+      background-color: #007aff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .how-link {
+      text-align: center;
+      font-size: 13px;
+      color: #007aff;
+      margin-top: 15px;
+      text-decoration: underline;
+    }
+
+    .arrow-down {
+      font-size: 30px;
+      color: #4d90fe;
+      margin-top: 20px;
+      display: none;
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="upi-box">
+  <h3>Select your UPI App</h3>
+
+  <div class="upi-grid">
+    <div class="upi-option" id="bhim">
+      <img src="https://getlogo.net/wp-content/uploads/2020/10/bharat-interface-for-money-bhim-logo-vector.png" alt="BHIM">
+    </div>
+    <div class="upi-option" id="phonepe">
+      <img src="https://cdn.worldvectorlogo.com/logos/phonepe-1.svg" alt="PhonePe"> 
+    </div>
+    <div class="upi-option" id="paytm">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Paytm_logo.png/640px-Paytm_logo.png" alt="Paytm"> 
+    </div>
+    <div class="upi-option" id="gpay">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Google_Pay_Logo_%282020%29.svg/1024px-Google_Pay_Logo_%282020%29.svg.png" alt="GPay">
+    </div>
+  </div>
+
+  <button class="other-upi-btn" onclick="openAnyUPIApp()">OTHER UPI APP</button>
+
+  <div class="arrow-down" id="arrow">↓</div>
+
+  <div class="how-link">How to pay using UPI?</div>
+</div>
+
+<script>
+  const upiID = "cashfree@axisbank";
+  const amount = "13";
+  const name = "cashfree";
+
+  const arrow = document.getElementById("arrow");
+
+  // App-specific UPI deeplinks
+  const links = {
+    bhim: `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`,
+    phonepe: `phonepe://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`,
+    gpay: `tez://upi/pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`,
+    paytm: `paytmmp://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`
+  };
+
+  // Individual app button actions
+  Object.keys(links).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", () => {
+        arrow.style.display = "block";
+        window.location.href = links[id];
+      });
+    }
+  });
+
+  // Open UPI picker (all installed UPI apps)
+  function openAnyUPIApp() {
+    const universalLink = `upi://pay?pa=${upiID}&pn=${encodeURIComponent(name)}&am=${amount}&cu=INR`;
+    arrow.style.display = "block";
+    window.location.href = universalLink;
+  }
+</script>
+
+</body>
+</html>

