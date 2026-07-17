@@ -1,856 +1,624 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bharat Gas LPG Checker</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bharat Gas LPG ID Checker</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
+
         .container {
-            max-width: 600px;
-            width: 100%;
             background: white;
             border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 0.5s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 30px;
         }
+
         .header h1 {
             color: #333;
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 700;
         }
+
         .header .subtitle {
-            color: #888;
+            color: #666;
             font-size: 14px;
-            margin-top: 4px;
+            margin-top: 5px;
         }
-        .header .badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 2px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            margin-top: 4px;
-        }
+
         .input-section {
             background: #f8f9fa;
+            padding: 20px;
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
+
         .input-group {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
+
         .input-group input {
             flex: 1;
-            padding: 10px 14px;
+            min-width: 200px;
+            padding: 12px 16px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-            font-family: monospace;
-            letter-spacing: 0.5px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
+
         .input-group input:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        .input-group input:disabled {
-            background: #f0f0f0;
-            cursor: not-allowed;
-        }
+
         .input-group button {
-            padding: 10px 24px;
+            padding: 12px 24px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
+            transition: all 0.3s ease;
         }
-        .input-group button:hover:not(:disabled) {
+
+        .input-group button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
+
         .input-group button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
         }
-        .quick-ids {
+
+        .example-tags {
+            margin-top: 10px;
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 12px;
-            align-items: center;
+            gap: 8px;
         }
-        .quick-ids span {
-            color: #666;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .quick-ids button {
+
+        .example-tag {
+            background: #e9ecef;
             padding: 4px 12px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
+            border-radius: 20px;
             font-size: 12px;
-            font-family: monospace;
-            transition: all 0.2s;
-            color: #333;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .quick-ids button:hover {
+
+        .example-tag:hover {
             background: #667eea;
             color: white;
-            border-color: #667eea;
-            transform: scale(1.05);
         }
-        .url-hint {
-            background: #f0f4ff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: #555;
-            border: 1px solid #d4e0ff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+
+        .status-section {
+            margin: 20px 0;
         }
-        .url-hint code {
-            background: #e4ecff;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            color: #667eea;
-            font-family: monospace;
-        }
+
         .loader {
             display: none;
             text-align: center;
-            padding: 30px 0;
+            padding: 20px;
         }
+
         .loader.active {
             display: block;
         }
+
         .spinner {
-            width: 45px;
-            height: 45px;
+            display: inline-block;
+            width: 40px;
+            height: 40px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+            animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .loader p {
-            margin-top: 12px;
-            color: #666;
-            font-size: 14px;
-        }
-        .loader .sub-text {
-            font-size: 12px;
-            color: #999;
-            margin-top: 4px;
-        }
-        .result {
-            display: none;
-            animation: slideDown 0.4s ease;
-        }
-        .result.active {
-            display: block;
-        }
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+
         .result-card {
+            display: none;
+            background: white;
+            border: 2px solid #e0e0e0;
             border-radius: 12px;
             padding: 20px;
-            border-left: 5px solid #28a745;
-            background: #f8f9fa;
+            margin-top: 20px;
+            animation: slideUp 0.4s ease;
         }
-        .result-card.invalid {
-            border-left-color: #dc3545;
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        .result-card.active {
+            display: block;
+        }
+
+        .result-card.success {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
         .result-card.error {
-            border-left-color: #ffc107;
+            border-color: #dc3545;
+            background: #fff5f5;
         }
-        .result-title {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 14px;
+
+        .result-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
         }
-        .result-title.valid { color: #28a745; }
-        .result-title.invalid { color: #dc3545; }
-        .result-title.error { color: #ffc107; }
-        .result-grid {
+
+        .result-header .status-badge {
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-badge.error {
+            background: #dc3545;
+            color: white;
+        }
+
+        .result-details {
             display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 6px 16px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
-        .result-item {
-            padding: 6px 0;
-            border-bottom: 1px solid #e9ecef;
-            display: contents;
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 10px 14px;
+            border-radius: 8px;
         }
-        .result-item .label {
-            color: #666;
+
+        .detail-item .label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .detail-item .value {
+            font-size: 16px;
             font-weight: 500;
-            font-size: 13px;
-            padding: 6px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        .result-item .value {
             color: #333;
-            font-size: 13px;
-            padding: 6px 0;
-            border-bottom: 1px solid #e9ecef;
+            margin-top: 4px;
             word-break: break-all;
         }
-        .result-item:last-child .label,
-        .result-item:last-child .value {
-            border-bottom: none;
-        }
-        .value.highlight {
+
+        .detail-item .value.highlight {
             color: #28a745;
             font-weight: 600;
         }
-        .value .tag {
-            display: inline-block;
-            padding: 1px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 6px;
+
+        .detail-item .value.missing {
+            color: #dc3545;
+            font-style: italic;
         }
-        .tag.success { background: #d4edda; color: #155724; }
-        .tag.warning { background: #fff3cd; color: #856404; }
-        .tag.danger { background: #f8d7da; color: #721c24; }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 16px;
-        }
-        .stat-box {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        .stat-box:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .stat-box .number {
-            font-size: 26px;
-            font-weight: 700;
-            color: #333;
-        }
-        .stat-box .label {
-            color: #888;
-            font-size: 12px;
-            margin-top: 2px;
-        }
-        .stat-box.valid .number { color: #28a745; }
-        .stat-box.invalid .number { color: #dc3545; }
-        .stat-box.total .number { color: #667eea; }
-        .history {
-            margin-top: 20px;
+
+        .result-actions {
+            margin-top: 15px;
+            padding-top: 15px;
             border-top: 2px solid #e9ecef;
-            padding-top: 16px;
-        }
-        .history-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .history-header h3 {
-            color: #333;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .history-header .clear-btn {
-            padding: 4px 14px;
-            background: #dc3545;
+
+        .btn-secondary {
+            padding: 8px 16px;
+            background: #6c757d;
             color: white;
             border: none;
             border-radius: 6px;
+            font-size: 14px;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
         }
-        .history-header .clear-btn:hover {
-            background: #c82333;
+
+        .btn-secondary:hover {
+            background: #5a6268;
         }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-section h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
         .history-list {
-            max-height: 220px;
+            max-height: 200px;
             overflow-y: auto;
         }
-        .history-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .history-list::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 2px;
-        }
+
         .history-item {
             background: #f8f9fa;
             padding: 8px 12px;
-            margin-bottom: 4px;
             border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
-            border-left: 3px solid transparent;
-            transition: all 0.2s;
         }
-        .history-item:hover {
-            background: #f0f0f0;
-        }
-        .history-item.valid {
-            border-left-color: #28a745;
-        }
-        .history-item.invalid {
-            border-left-color: #dc3545;
-        }
-        .history-item .id {
-            font-weight: 600;
-            color: #333;
-            font-family: monospace;
-        }
-        .history-item .status {
-            font-weight: 600;
-            font-size: 12px;
-        }
-        .history-item .status.valid { color: #28a745; }
-        .history-item .status.invalid { color: #dc3545; }
-        .history-item .time {
-            color: #999;
+
+        .history-item .badge {
+            padding: 2px 10px;
+            border-radius: 12px;
             font-size: 11px;
+            font-weight: 600;
         }
-        .empty-history {
-            text-align: center;
-            color: #999;
-            padding: 20px;
-            font-size: 14px;
+
+        .badge.valid {
+            background: #28a745;
+            color: white;
         }
-        .copy-link {
-            background: none;
-            border: none;
-            color: #667eea;
-            cursor: pointer;
-            font-size: 12px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
+
+        .badge.invalid {
+            background: #dc3545;
+            color: white;
         }
-        .copy-link:hover {
-            background: #e4ecff;
-        }
-        @media (max-width: 480px) {
-            .container { padding: 16px; }
-            .input-group { flex-direction: column; }
-            .input-group button { width: 100%; }
-            .result-grid { grid-template-columns: 1fr; gap: 2px; }
-            .result-item .label { 
-                font-weight: 600;
-                border-bottom: none;
-                padding-bottom: 0;
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
             }
-            .result-item .value {
-                padding-top: 0;
-                border-bottom: 1px solid #e9ecef;
+
+            .result-details {
+                grid-template-columns: 1fr;
             }
-            .stats { grid-template-columns: 1fr; }
-            .history-item { flex-wrap: wrap; gap: 4px; }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            .input-group input {
+                min-width: 100%;
+            }
+
+            .input-group button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔥 Bharat Gas Checker</h1>
-            <div class="subtitle">Check LPG ID validity & consumer details</div>
-            <span class="badge">⚡ Real-time API</span>
+            <h1>🚀 Bharat Gas LPG Checker</h1>
+            <p class="subtitle">Check LPG ID validity and consumer details</p>
         </div>
 
         <div class="input-section">
             <div class="input-group">
-                <input type="text" id="lpgInput" placeholder="Enter LPG ID (e.g., 20000290)" autofocus />
+                <input 
+                    type="text" 
+                    id="lpgInput" 
+                    placeholder="Enter LPG ID (e.g., 20000290)" 
+                    aria-label="LPG ID Input"
+                />
                 <button id="checkBtn">🔍 Check</button>
             </div>
-
-            <div class="quick-ids">
-                <span>Quick IDs:</span>
-                <button onclick="checkLPG('20000290')">20000290</button>
-                <button onclick="checkLPG('20000291')">20000291</button>
-                <button onclick="checkLPG('20000292')">20000292</button>
-                <button onclick="checkLPG('20000293')">20000293</button>
-                <button onclick="checkLPG('20000294')">20000294</button>
-                <button onclick="checkLPG('20000295')">20000295</button>
-            </div>
-
-            <div class="url-hint">
-                <span>🔗</span>
-                <span>Share link:</span>
-                <code id="shareLink">?lpgid=20000290</code>
-                <button class="copy-link" onclick="copyShareLink()">📋 Copy</button>
+            <div class="example-tags">
+                <span class="example-tag" onclick="setExample('20000290')">20000290</span>
+                <span class="example-tag" onclick="setExample('20000291')">20000291</span>
+                <span class="example-tag" onclick="setExample('20000292')">20000292</span>
+                <span class="example-tag" onclick="setExample('20000293')">20000293</span>
+                <span style="font-size:12px;color:#6c757d;margin-left:5px;">(Click to test)</span>
             </div>
         </div>
 
-        <div class="loader" id="loader">
-            <div class="spinner"></div>
-            <p>Checking LPG ID...</p>
-            <div class="sub-text">Please wait while we fetch the details</div>
-        </div>
+        <div class="status-section">
+            <div class="loader" id="loader">
+                <div class="spinner"></div>
+                <p style="margin-top:10px;color:#6c757d;">Checking LPG ID...</p>
+            </div>
 
-        <div class="result" id="result">
             <div class="result-card" id="resultCard">
-                <div class="result-title" id="resultTitle"></div>
-                <div id="resultContent"></div>
+                <div class="result-header">
+                    <span id="resultTitle" style="font-weight:600;font-size:18px;">Result</span>
+                    <span class="status-badge" id="statusBadge">Status</span>
+                </div>
+                <div class="result-details" id="resultDetails">
+                    <!-- Dynamically populated -->
+                </div>
+                <div class="result-actions">
+                    <button class="btn-secondary" onclick="copyResult()">📋 Copy Details</button>
+                    <button class="btn-secondary" onclick="clearResult()">🗑️ Clear</button>
+                </div>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-box valid">
-                <div class="number" id="validCount">0</div>
-                <div class="label">✅ Valid</div>
-            </div>
-            <div class="stat-box invalid">
-                <div class="number" id="invalidCount">0</div>
-                <div class="label">❌ Invalid</div>
-            </div>
-            <div class="stat-box total">
-                <div class="number" id="totalCount">0</div>
-                <div class="label">📊 Total Checked</div>
-            </div>
-        </div>
-
-        <div class="history">
-            <div class="history-header">
-                <h3>📜 History</h3>
-                <button class="clear-btn" onclick="clearHistory()">🗑️ Clear</button>
-            </div>
+        <div class="history-section">
+            <h3>📜 History</h3>
             <div class="history-list" id="historyList">
-                <div class="empty-history">No history yet</div>
+                <p style="color:#6c757d;font-size:14px;text-align:center;">No checks performed yet</p>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        // 1. CONFIGURATION - Exactly like Python code
-        // ============================================================
-        const CONFIG = {
-            url: 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/ValidationConsumer',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36',
-                'x-requested-with': 'XMLHttpRequest',
-                'referer': 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/Index',
-                'Cookie': 'myBharatgas:isConsentProvided=true; myBharatgas_AuthToken=Dn/0h/AMJqlH8u4P3nXKPaCIfuS5rrzeiw4ehbJQghuo/AnU1C3RFlYP1IkqLPf8yuu4lkJPAHtV8AyqlrlCuvD5n9SDnbhtY5PilGwb7tt+LKxnoNnuKgPrZcEaJGt4; ASP.NET_SessionId=t2ogzkjewegi3njisyxycuad; lang=en; __RequestVerificationToken=dkvUmeyIae99OFbOU12VeeLz2KGHKebJQ0jevpGHY83meeoyMmJGMwuXMVsZdmBWhyLsC9mk7pUwChUzu-c87dUSoWY9O9007LUCjEU4vhY1; __RequestVerificationToken_L2JoYXJhdGdhcw2=A_JsOmRFmxwZD5f-ZME0XF01nH4sDO3ZenTxl1o4dS4V_cPl_PMOO0lS8OTtcebIza0pIlIDQTlv1KAQDIQmYxdXgcRdexP29yD0ChwWtbo1; RT="z=1&dm=my.ebharatgas.com&si=a6c7fc9d-8bfd-4c08-be12-fe197fcd4cd9&ss=mo4gpv8m&sl=2&tt=r7c&rl=1&nu=1lp5jbpl&cl=5bgp&ld=5bh0&r=12g9p87h&ul=5bh1"'
-            },
-            captchaText: 'ET1MK2'
+        // Configuration
+        const API_URL = 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/ValidationConsumer';
+        
+        // Headers (same as Python version)
+        const HEADERS = {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36',
+            'x-requested-with': 'XMLHttpRequest',
+            'referer': 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/Index',
+            'Cookie': 'myBharatgas:isConsentProvided=true; myBharatgas_AuthToken=Dn/0h/AMJqlH8u4P3nXKPaCIfuS5rrzeiw4ehbJQghuo/AnU1C3RFlYP1IkqLPf8yuu4lkJPAHtV8AyqlrlCuvD5n9SDnbhtY5PilGwb7tt+LKxnoNnuKgPrZcEaJGt4; ASP.NET_SessionId=t2ogzkjewegi3njisyxycuad; lang=en; __RequestVerificationToken=dkvUmeyIae99OFbOU12VeeLz2KGHKebJQ0jevpGHY83meeoyMmJGMwuXMVsZdmBWhyLsC9mk7pUwChUzu-c87dUSoWY9O9007LUCjEU4vhY1; __RequestVerificationToken_L2JoYXJhdGdhcw2=A_JsOmRFmxwZD5f-ZME0XF01nH4sDO3ZenTxl1o4dS4V_cPl_PMOO0lS8OTtcebIza0pIlIDQTlv1KAQDIQmYxdXgcRdexP29yD0ChwWtbo1; RT="z=1&dm=my.ebharatgas.com&si=a6c7fc9d-8bfd-4c08-be12-fe197fcd4cd9&ss=mo4gpv8m&sl=2&tt=r7c&rl=1&nu=1lp5jbpl&cl=5bgp&ld=5bh0&r=12g9p87h&ul=5bh1"'
         };
 
-        // ============================================================
-        // 2. CORS PROXIES (for browser)
-        // ============================================================
-        const PROXIES = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://cors-anywhere.herokuapp.com/'
-        ];
+        // State
+        let history = [];
+        let isChecking = false;
 
-        // ============================================================
-        // 3. STATE
-        // ============================================================
-        let state = {
-            history: [],
-            validCount: 0,
-            invalidCount: 0,
-            totalCount: 0,
-            currentProxy: 0,
-            isChecking: false
-        };
+        // DOM elements
+        const lpgInput = document.getElementById('lpgInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const loader = document.getElementById('loader');
+        const resultCard = document.getElementById('resultCard');
+        const resultTitle = document.getElementById('resultTitle');
+        const statusBadge = document.getElementById('statusBadge');
+        const resultDetails = document.getElementById('resultDetails');
+        const historyList = document.getElementById('historyList');
 
-        // ============================================================
-        // 4. DOM REFS
-        // ============================================================
-        const $ = (id) => document.getElementById(id);
-        const dom = {
-            input: $('lpgInput'),
-            checkBtn: $('checkBtn'),
-            loader: $('loader'),
-            result: $('result'),
-            resultCard: $('resultCard'),
-            resultTitle: $('resultTitle'),
-            resultContent: $('resultContent'),
-            validCount: $('validCount'),
-            invalidCount: $('invalidCount'),
-            totalCount: $('totalCount'),
-            historyList: $('historyList'),
-            shareLink: $('shareLink')
-        };
+        // Event listeners
+        checkBtn.addEventListener('click', () => checkLPG());
+        lpgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkLPG();
+        });
 
-        // ============================================================
-        // 5. CORE FUNCTION - checkLPG (matches Python logic)
-        // ============================================================
-        function checkLPG(lpgId) {
-            // Clean input
-            const idStr = String(lpgId).trim();
-            
-            // Validate - must be numeric
-            if (!/^\d+$/.test(idStr)) {
-                showError('Invalid LPG ID', 'Please enter a valid numeric LPG ID');
+        // Set example ID
+        function setExample(id) {
+            lpgInput.value = id;
+            checkLPG();
+        }
+
+        // Main check function
+        async function checkLPG() {
+            const input = lpgInput.value.trim();
+            if (!input) {
+                alert('Please enter an LPG ID');
                 return;
             }
 
-            // Format to 16 digits with leading zeros (like Python: f"{int(lpg_id):016d}")
-            const formattedId = idStr.padStart(16, '0');
-
-            // Update share link
-            dom.shareLink.textContent = `?lpgid=${idStr}`;
+            if (isChecking) return;
+            isChecking = true;
+            checkBtn.disabled = true;
 
             // Show loader
-            dom.loader.classList.add('active');
-            dom.result.classList.remove('active');
-            dom.checkBtn.disabled = true;
-            dom.input.disabled = true;
-            state.isChecking = true;
+            loader.classList.add('active');
+            resultCard.classList.remove('active');
 
-            // Build params (exactly like Python)
-            const params = new URLSearchParams({
-                'captchaText': CONFIG.captchaText,
-                'mobileNo': '',
-                'LPGId': formattedId,
-                'consumerNo': '',
-                'distributorCode': '',
-                '_': Date.now()
-            });
+            try {
+                // Format LPG ID to 16 digits with leading zeros
+                const lpgId = parseInt(input);
+                if (isNaN(lpgId) || lpgId < 0) {
+                    throw new Error('Invalid LPG ID format');
+                }
+                const formattedId = String(lpgId).padStart(16, '0');
 
-            const fullUrl = `${CONFIG.url}?${params}`;
-            
-            // Try with proxy
-            makeRequest(fullUrl, formattedId);
-        }
+                // Build request parameters
+                const timestamp = Date.now();
+                const params = new URLSearchParams({
+                    captchaText: 'ET1MK2',
+                    mobileNo: '',
+                    LPGId: formattedId,
+                    consumerNo: '',
+                    distributorCode: '',
+                    '_': timestamp
+                });
 
-        // ============================================================
-        // 6. REQUEST WITH PROXY
-        // ============================================================
-        function makeRequest(url, formattedId) {
-            const proxy = PROXIES[state.currentProxy];
-            const proxyUrl = proxy + encodeURIComponent(url);
+                const url = `${API_URL}?${params.toString()}`;
 
-            fetch(proxyUrl, {
-                headers: CONFIG.headers
-            })
-            .then(response => {
+                // Make request
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: HEADERS
+                });
+
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                return response.json();
-            })
-            .then(data => {
-                // Success - process result
-                dom.loader.classList.remove('active');
-                dom.checkBtn.disabled = false;
-                dom.input.disabled = false;
-                state.isChecking = false;
-                
-                processResult(formattedId, data);
-            })
-            .catch(error => {
-                // Try next proxy
-                if (state.currentProxy < PROXIES.length - 1) {
-                    state.currentProxy++;
-                    console.log(`Trying proxy ${state.currentProxy + 1}...`);
-                    makeRequest(url, formattedId);
-                } else {
-                    // All proxies failed
-                    dom.loader.classList.remove('active');
-                    dom.checkBtn.disabled = false;
-                    dom.input.disabled = false;
-                    state.isChecking = false;
-                    
-                    showError('Connection Error', 'Unable to reach server. Please try again later.');
-                    console.error('All proxies failed:', error);
-                }
-            });
-        }
 
-        // ============================================================
-        // 7. PROCESS RESULT (matches Python logic)
-        // ============================================================
-        function processResult(lpgId, data) {
-            // Check if valid (like Python: data.get('IsValid'))
-            if (data && data.IsValid === true) {
-                const mobile = data.MobileNumber || '';
-                const hasMobile = mobile && mobile.trim() !== '';
-                
-                // Show valid result
-                showValidResult(lpgId, data, hasMobile);
-                
-                // Update stats
-                state.validCount++;
-                state.totalCount++;
-                addHistory(lpgId, 'Valid');
-                
-            } else if (data && data.IsValid === false) {
-                // Invalid consumer
-                showInvalidResult(lpgId);
-                
-                state.invalidCount++;
-                state.totalCount++;
-                addHistory(lpgId, 'Invalid');
-                
-            } else {
-                // Unexpected response
-                showError('Invalid Response', 'Unexpected response from server');
+                const data = await response.json();
+                displayResult(data, formattedId);
+
+            } catch (error) {
+                displayError(error.message);
+            } finally {
+                loader.classList.remove('active');
+                isChecking = false;
+                checkBtn.disabled = false;
             }
-            
-            updateStats();
         }
 
-        // ============================================================
-        // 8. UI RENDER FUNCTIONS
-        // ============================================================
-        function showValidResult(lpgId, data, hasMobile) {
-            dom.result.classList.add('active');
-            dom.resultCard.className = 'result-card';
-            dom.resultTitle.className = 'result-title valid';
-            dom.resultTitle.innerHTML = '✅ VALID CONSUMER FOUND!';
-
+        // Display result
+        function displayResult(data, lpgId) {
+            const isValid = data.IsValid || false;
             const mobile = data.MobileNumber || '';
-            const mobileDisplay = mobile || 'Not Available';
-            const mobileTag = hasMobile 
-                ? '<span class="tag success">✅ Has Mobile</span>' 
-                : '<span class="tag warning">⚠️ No Mobile</span>';
+            const hasMobile = mobile && mobile.trim().length > 0;
 
-            let html = `
-                <div class="result-grid">
-                    <div class="result-item">
-                        <span class="label">📍 LPG ID</span>
-                        <span class="value">${lpgId}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">🆔 Consumer ID</span>
-                        <span class="value">${data.ConsumerId || 'N/A'}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">🔢 Consumer Number</span>
-                        <span class="value">${data.ConsumerNumber || 'N/A'}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">👤 Consumer Name</span>
-                        <span class="value">${data.ConsumerName || 'N/A'}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">📞 Mobile Number</span>
-                        <span class="value ${hasMobile ? 'highlight' : ''}">${mobileDisplay} ${mobileTag}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">📧 Email ID</span>
-                        <span class="value">${data.emailId || 'Not Available'}</span>
+            // Update result card
+            resultCard.className = 'result-card active ' + (isValid ? 'success' : 'error');
+            resultTitle.textContent = isValid ? '✅ Valid Consumer Found!' : '❌ Invalid Consumer';
+            statusBadge.textContent = isValid ? 'VALID' : 'INVALID';
+            statusBadge.className = 'status-badge ' + (isValid ? 'success' : 'error');
+
+            // Build details
+            const details = [
+                { label: 'LPG ID', value: lpgId, highlight: true },
+                { label: 'Consumer ID', value: data.ConsumerId || 'N/A' },
+                { label: 'Consumer Number', value: data.ConsumerNumber || 'N/A' },
+                { label: 'Consumer Name', value: data.ConsumerName || 'N/A' },
+                { 
+                    label: 'Mobile Number', 
+                    value: hasMobile ? mobile : 'Not Available',
+                    highlight: hasMobile,
+                    missing: !hasMobile
+                },
+                { label: 'Email ID', value: data.emailId || 'Not Available' }
+            ];
+
+            resultDetails.innerHTML = details.map(item => `
+                <div class="detail-item">
+                    <div class="label">${item.label}</div>
+                    <div class="value ${item.highlight ? 'highlight' : ''} ${item.missing ? 'missing' : ''}">
+                        ${item.value}
                     </div>
                 </div>
-            `;
-            
-            dom.resultContent.innerHTML = html;
+            `).join('');
+
+            // Add to history
+            addHistory(lpgId, isValid, hasMobile);
         }
 
-        function showInvalidResult(lpgId) {
-            dom.result.classList.add('active');
-            dom.resultCard.className = 'result-card invalid';
-            dom.resultTitle.className = 'result-title invalid';
-            dom.resultTitle.innerHTML = '❌ INVALID CONSUMER';
+        // Display error
+        function displayError(message) {
+            resultCard.className = 'result-card active error';
+            resultTitle.textContent = '⚠️ Error';
+            statusBadge.textContent = 'ERROR';
+            statusBadge.className = 'status-badge error';
 
-            dom.resultContent.innerHTML = `
-                <div class="result-grid">
-                    <div class="result-item">
-                        <span class="label">📍 LPG ID</span>
-                        <span class="value">${lpgId}</span>
-                    </div>
-                    <div class="result-item">
-                        <span class="label">Status</span>
-                        <span class="value">This LPG ID does not exist or is not valid</span>
-                    </div>
+            resultDetails.innerHTML = `
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <div class="label">Error Message</div>
+                    <div class="value" style="color:#dc3545;">${message}</div>
                 </div>
             `;
         }
 
-        function showError(title, message) {
-            dom.result.classList.add('active');
-            dom.resultCard.className = 'result-card error';
-            dom.resultTitle.className = 'result-title error';
-            dom.resultTitle.innerHTML = `⚠️ ${title}`;
+        // Add to history
+        function addHistory(lpgId, isValid, hasMobile) {
+            const entry = {
+                id: lpgId,
+                isValid: isValid,
+                hasMobile: hasMobile,
+                timestamp: new Date().toLocaleTimeString()
+            };
 
-            dom.resultContent.innerHTML = `
-                <div class="result-grid">
-                    <div class="result-item">
-                        <span class="label">Message</span>
-                        <span class="value">${message}</span>
-                    </div>
-                </div>
-            `;
+            history.unshift(entry);
+            if (history.length > 20) history.pop(); // Keep last 20
+
+            updateHistoryUI();
         }
 
-        // ============================================================
-        // 9. HISTORY
-        // ============================================================
-        function addHistory(id, status) {
-            const time = new Date().toLocaleTimeString();
-            state.history.unshift({ id, status, time });
-            if (state.history.length > 50) state.history.pop();
-            renderHistory();
-        }
-
-        function renderHistory() {
-            if (state.history.length === 0) {
-                dom.historyList.innerHTML = '<div class="empty-history">No history yet</div>';
+        // Update history UI
+        function updateHistoryUI() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<p style="color:#6c757d;font-size:14px;text-align:center;">No checks performed yet</p>';
                 return;
             }
 
-            let html = '';
-            state.history.forEach(item => {
-                const statusClass = item.status === 'Valid' ? 'valid' : 'invalid';
-                const emoji = item.status === 'Valid' ? '✅' : '❌';
-                html += `
-                    <div class="history-item ${statusClass}">
-                        <span class="id">${item.id}</span>
-                        <span class="status ${statusClass}">${emoji} ${item.status}</span>
-                        <span class="time">${item.time}</span>
-                    </div>
-                `;
-            });
-            dom.historyList.innerHTML = html;
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <span>${item.id}</span>
+                    <span>
+                        <span class="badge ${item.isValid ? 'valid' : 'invalid'}">
+                            ${item.isValid ? '✅' : '❌'} ${item.isValid ? 'Valid' : 'Invalid'}
+                            ${item.isValid ? (item.hasMobile ? '📱' : '📭') : ''}
+                        </span>
+                        <span style="font-size:11px;color:#6c757d;margin-left:8px;">${item.timestamp}</span>
+                    </span>
+                </div>
+            `).join('');
         }
 
-        function clearHistory() {
-            state.history = [];
-            state.validCount = 0;
-            state.invalidCount = 0;
-            state.totalCount = 0;
-            renderHistory();
-            updateStats();
-            dom.result.classList.remove('active');
-        }
-
-        // ============================================================
-        // 10. STATS
-        // ============================================================
-        function updateStats() {
-            dom.validCount.textContent = state.validCount;
-            dom.invalidCount.textContent = state.invalidCount;
-            dom.totalCount.textContent = state.totalCount;
-        }
-
-        // ============================================================
-        // 11. SHARE LINK
-        // ============================================================
-        function copyShareLink() {
-            const link = dom.shareLink.textContent;
-            const fullUrl = window.location.origin + window.location.pathname + link;
+        // Copy result
+        function copyResult() {
+            const details = resultDetails.querySelectorAll('.detail-item');
+            let text = 'BHARAT GAS LPG CHECK RESULT\n';
+            text += '='.repeat(40) + '\n';
             
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                const btn = document.querySelector('.copy-link');
-                btn.textContent = '✅ Copied!';
-                setTimeout(() => btn.textContent = '📋 Copy', 2000);
+            details.forEach(item => {
+                const label = item.querySelector('.label')?.textContent || '';
+                const value = item.querySelector('.value')?.textContent || '';
+                text += `${label}: ${value}\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Result copied to clipboard!');
             }).catch(() => {
                 // Fallback
                 const textarea = document.createElement('textarea');
-                textarea.value = fullUrl;
+                textarea.value = text;
                 document.body.appendChild(textarea);
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
-                alert('Link copied to clipboard!');
+                alert('✅ Result copied to clipboard!');
             });
         }
 
-        // ============================================================
-        // 12. URL PARAMETER AUTO-CHECK
-        // ============================================================
-        function autoCheckFromURL() {
-            const params = new URLSearchParams(window.location.search);
-            const lpgid = params.get('lpgid');
-            
-            if (lpgid && /^\d+$/.test(lpgid)) {
-                dom.input.value = lpgid;
-                dom.shareLink.textContent = `?lpgid=${lpgid}`;
-                setTimeout(() => checkLPG(lpgid), 500);
-            }
+        // Clear result
+        function clearResult() {
+            resultCard.classList.remove('active');
+            lpgInput.value = '';
+            lpgInput.focus();
         }
 
-        // ============================================================
-        // 13. EVENT LISTENERS
-        // ============================================================
-        // Enter key
-        dom.input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !state.isChecking) {
-                dom.checkBtn.click();
-            }
-        });
+        // Initial focus
+        lpgInput.focus();
 
-        // Check button
-        dom.checkBtn.addEventListener('click', function() {
-            const input = dom.input.value.trim();
-            if (!input) {
-                alert('Please enter an LPG ID');
-                dom.input.focus();
-                return;
-            }
-            checkLPG(input);
-        });
-
-        // ============================================================
-        // 14. INIT
-        // ============================================================
-        renderHistory();
-        updateStats();
-        autoCheckFromURL();
-        dom.input.focus();
+        console.log('🚀 Bharat Gas LPG Checker loaded successfully!');
+        console.log('ℹ️  Enter an LPG ID and click Check to verify.');
     </script>
 </body>
 </html>
