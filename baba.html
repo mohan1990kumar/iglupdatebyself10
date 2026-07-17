@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Gas LPG Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 550px;
+            width: 100%;
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .input-group input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            min-width: 0;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .input-group button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .input-group button:hover {
+            background: #5a6fd6;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .input-group button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .quick-ids {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+        .quick-ids span {
+            color: #666;
+            font-size: 12px;
+            padding: 4px 0;
+        }
+        .quick-ids button {
+            padding: 4px 12px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .quick-ids button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loader.active {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader p {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        .result {
+            display: none;
+            animation: fadeIn 0.4s;
+        }
+        .result.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-card {
+            border-radius: 10px;
+            padding: 16px;
+            border-left: 4px solid #28a745;
+            background: #f8f9fa;
+            margin-top: 16px;
+        }
+        .result-card.invalid {
+            border-left-color: #dc3545;
+        }
+        .result-card.error {
+            border-left-color: #ffc107;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .result-title.valid { color: #28a745; }
+        .result-title.invalid { color: #dc3545; }
+        .result-title.error { color: #ffc107; }
+        .result-item {
+            display: flex;
+            padding: 4px 0;
+            font-size: 14px;
+            gap: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            color: #666;
+            min-width: 100px;
+            font-weight: 500;
+        }
+        .result-value {
+            color: #333;
+            word-break: break-all;
+        }
+        .result-value.highlight {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .badge.success { background: #d4edda; color: #155724; }
+        .badge.warning { background: #fff3cd; color: #856404; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .stat-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-box .number {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-box .label {
+            color: #888;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+        .stat-box.valid .number { color: #28a745; }
+        .stat-box.invalid .number { color: #dc3545; }
+        .history {
+            margin-top: 20px;
+            border-top: 2px solid #e9ecef;
+            padding-top: 16px;
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .history-header h3 {
+            color: #333;
+            font-size: 16px;
+        }
+        .history-header button {
+            padding: 4px 14px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .history-header button:hover {
+            background: #c82333;
+        }
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .history-item {
+            background: #f8f9fa;
+            padding: 8px 12px;
+            margin-bottom: 4px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+        .history-item .id {
+            font-weight: 600;
+            color: #333;
+        }
+        .history-item .status.valid { color: #28a745; font-weight: 600; }
+        .history-item .status.invalid { color: #dc3545; font-weight: 600; }
+        .history-item .time {
+            color: #999;
+            font-size: 11px;
+        }
+        .empty-history {
+            text-align: center;
+            color: #999;
+            padding: 16px;
+            font-size: 14px;
+        }
+        .url-info {
+            background: #f0f4ff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #555;
+            border: 1px solid #d4e0ff;
+        }
+        .url-info code {
+            background: #e4ecff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #667eea;
+            word-break: break-all;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 16px; }
+            .input-group { flex-direction: column; }
+            .input-group button { width: 100%; }
+            .result-item { flex-direction: column; gap: 2px; }
+            .result-label { min-width: auto; }
+            .stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Bharat Gas Checker</h1>
+        <p class="subtitle">Check LPG ID validity instantly</p>
+        
+        <div class="url-info" id="urlInfo">
+            💡 <strong>URL Parameter:</strong> Use <code>?lpgid=20000290</code> to auto-check
+        </div>
+        
+        <div class="input-group">
+            <input type="text" id="lpgInput" placeholder="Enter LPG ID (e.g., 20000290)" />
+            <button id="checkBtn">🔍 Check</button>
+        </div>
+        
+        <div class="quick-ids">
+            <span>Quick:</span>
+            <button onclick="checkLPG('20000290')">20000290</button>
+            <button onclick="checkLPG('20000291')">20000291</button>
+            <button onclick="checkLPG('20000292')">20000292</button>
+            <button onclick="checkLPG('20000293')">20000293</button>
+            <button onclick="checkLPG('20000294')">20000294</button>
+        </div>
+        
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <p>Checking...</p>
+        </div>
+        
+        <div class="result" id="result">
+            <div class="result-card" id="resultCard">
+                <div class="result-title" id="resultTitle"></div>
+                <div id="resultContent"></div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box valid">
+                <div class="number" id="validCount">0</div>
+                <div class="label">✅ Valid</div>
+            </div>
+            <div class="stat-box invalid">
+                <div class="number" id="invalidCount">0</div>
+                <div class="label">❌ Invalid</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="totalCount">0</div>
+                <div class="label">📊 Total</div>
+            </div>
+        </div>
+        
+        <div class="history">
+            <div class="history-header">
+                <h3>📜 History</h3>
+                <button onclick="clearHistory()">Clear</button>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-history">No history yet</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Headers from your original Python code
+        const HEADERS = {
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36',
+            'x-requested-with': 'XMLHttpRequest',
+            'referer': 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/Index',
+            'Cookie': 'myBharatgas:isConsentProvided=true; myBharatgas_AuthToken=Dn/0h/AMJqlH8u4P3nXKPaCIfuS5rrzeiw4ehbJQghuo/AnU1C3RFlYP1IkqLPf8yuu4lkJPAHtV8AyqlrlCuvD5n9SDnbhtY5PilGwb7tt+LKxnoNnuKgPrZcEaJGt4; ASP.NET_SessionId=t2ogzkjewegi3njisyxycuad; lang=en; __RequestVerificationToken=dkvUmeyIae99OFbOU12VeeLz2KGHKebJQ0jevpGHY83meeoyMmJGMwuXMVsZdmBWhyLsC9mk7pUwChUzu-c87dUSoWY9O9007LUCjEU4vhY1; __RequestVerificationToken_L2JoYXJhdGdhcw2=A_JsOmRFmxwZD5f-ZME0XF01nH4sDO3ZenTxl1o4dS4V_cPl_PMOO0lS8OTtcebIza0pIlIDQTlv1KAQDIQmYxdXgcRdexP29yD0ChwWtbo1; RT="z=1&dm=my.ebharatgas.com&si=a6c7fc9d-8bfd-4c08-be12-fe197fcd4cd9&ss=mo4gpv8m&sl=2&tt=r7c&rl=1&nu=1lp5jbpl&cl=5bgp&ld=5bh0&r=12g9p87h&ul=5bh1"'
+        };
+        
+        const URL = 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/ValidationConsumer';
+        
+        // CORS Proxy (free public proxy)
+        const PROXIES = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://cors-anywhere.herokuapp.com/'
+        ];
+        
+        let currentProxyIndex = 0;
+        let history = [];
+        let validCount = 0;
+        let invalidCount = 0;
+        let totalCount = 0;
+        let isAutoCheck = false;
+        
+        const lpgInput = document.getElementById('lpgInput');
+        const checkBtn = document.getElementById('checkBtn');
+        const loader = document.getElementById('loader');
+        const result = document.getElementById('result');
+        const resultCard = document.getElementById('resultCard');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultContent = document.getElementById('resultContent');
+        const historyList = document.getElementById('historyList');
+        const urlInfo = document.getElementById('urlInfo');
+        
+        // Get URL parameters
+        function getURLParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                lpgid: params.get('lpgid'),
+                captcha: params.get('captcha') || 'ET1MK2'
+            };
+        }
+        
+        // Enter key support
+        lpgInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkBtn.click();
+            }
+        });
+        
+        checkBtn.addEventListener('click', function() {
+            const input = lpgInput.value.trim();
+            if (!input) {
+                alert('Please enter an LPG ID');
+                return;
+            }
+            checkLPG(input);
+        });
+        
+        function checkLPG(lpgId) {
+            const idStr = String(lpgId).trim();
+            
+            if (!/^\d+$/.test(idStr)) {
+                showError('Invalid ID', 'Please enter a valid numeric LPG ID');
+                return;
+            }
+            
+            // Format to 16 digits
+            const formattedId = idStr.padStart(16, '0');
+            
+            // Show loader
+            loader.classList.add('active');
+            result.classList.remove('active');
+            checkBtn.disabled = true;
+            lpgInput.disabled = true;
+            
+            // Get captcha from URL or use default
+            const params = getURLParams();
+            const captchaText = params.captcha || 'W0YHWO';
+            
+            // Build URL with parameters
+            const queryParams = new URLSearchParams({
+                'captchaText': captchaText,
+                'mobileNo': '',
+                'LPGId': formattedId,
+                'consumerNo': '',
+                'distributorCode': '',
+                '_': Date.now()
+            });
+            
+            const fullUrl = `${URL}?${queryParams}`;
+            
+            // Try with proxy
+            makeRequestWithProxy(fullUrl, formattedId);
+        }
+        
+        function makeRequestWithProxy(url, formattedId) {
+            const proxy = PROXIES[currentProxyIndex];
+            const proxyUrl = proxy + encodeURIComponent(url);
+            
+            fetch(proxyUrl, {
+                headers: HEADERS
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                loader.classList.remove('active');
+                checkBtn.disabled = false;
+                lpgInput.disabled = false;
+                
+                processResult(formattedId, data);
+            })
+            .catch(error => {
+                // Try next proxy
+                if (currentProxyIndex < PROXIES.length - 1) {
+                    currentProxyIndex++;
+                    console.log(`Trying proxy ${currentProxyIndex + 1}...`);
+                    makeRequestWithProxy(url, formattedId);
+                } else {
+                    // All proxies failed - show error
+                    loader.classList.remove('active');
+                    checkBtn.disabled = false;
+                    lpgInput.disabled = false;
+                    showError('Connection Error', 'Unable to reach server. Please try again later.');
+                    console.error('All proxies failed:', error);
+                }
+            });
+        }
+        
+        function processResult(lpgId, data) {
+            if (data && data.IsValid === true) {
+                const mobile = data.MobileNumber || '';
+                const hasMobile = mobile && mobile.trim();
+                
+                showValidResult(lpgId, data, hasMobile);
+                
+                validCount++;
+                totalCount++;
+                addHistory(lpgId, 'Valid');
+                
+            } else if (data && data.IsValid === false) {
+                showInvalidResult(lpgId);
+                
+                invalidCount++;
+                totalCount++;
+                addHistory(lpgId, 'Invalid');
+                
+            } else {
+                showError('Invalid Response', 'Unexpected response from server');
+            }
+            
+            updateStats();
+        }
+        
+        function showValidResult(lpgId, data, hasMobile) {
+            result.classList.add('active');
+            resultCard.className = 'result-card';
+            resultTitle.className = 'result-title valid';
+            resultTitle.textContent = '✅ VALID CONSUMER';
+            
+            const mobile = data.MobileNumber || '';
+            
+            let html = '';
+            html += `<div class="result-item"><span class="result-label">📍 LPG ID</span><span class="result-value">${lpgId}</span></div>`;
+            html += `<div class="result-item"><span class="result-label">🆔 Consumer ID</span><span class="result-value">${data.ConsumerId || 'N/A'}</span></div>`;
+            html += `<div class="result-item"><span class="result-label">🔢 Consumer No.</span><span class="result-value">${data.ConsumerNumber || 'N/A'}</span></div>`;
+            html += `<div class="result-item"><span class="result-label">👤 Name</span><span class="result-value">${data.ConsumerName || 'N/A'}</span></div>`;
+            html += `<div class="result-item"><span class="result-label">📞 Mobile</span><span class="result-value ${hasMobile ? 'highlight' : ''}">${mobile || 'Not Available'} ${hasMobile ? '<span class="badge success">✅ Has</span>' : '<span class="badge warning">⚠️ No</span>'}</span></div>`;
+            html += `<div class="result-item"><span class="result-label">📧 Email</span><span class="result-value">${data.emailId || 'Not Available'}</span></div>`;
+            
+            resultContent.innerHTML = html;
+        }
+        
+        function showInvalidResult(lpgId) {
+            result.classList.add('active');
+            resultCard.className = 'result-card invalid';
+            resultTitle.className = 'result-title invalid';
+            resultTitle.textContent = '❌ INVALID CONSUMER';
+            
+            resultContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">📍 LPG ID</span>
+                    <span class="result-value">${lpgId}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Status</span>
+                    <span class="result-value">This LPG ID does not exist or is not valid</span>
+                </div>
+            `;
+        }
+        
+        function showError(title, message) {
+            result.classList.add('active');
+            resultCard.className = 'result-card error';
+            resultTitle.className = 'result-title error';
+            resultTitle.textContent = `⚠️ ${title}`;
+            
+            resultContent.innerHTML = `
+                <div class="result-item">
+                    <span class="result-label">Message</span>
+                    <span class="result-value">${message}</span>
+                </div>
+            `;
+        }
+        
+        function addHistory(id, status) {
+            const time = new Date().toLocaleTimeString();
+            history.unshift({ id, status, time });
+            if (history.length > 50) history.pop();
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="empty-history">No history yet</div>';
+                return;
+            }
+            
+            let html = '';
+            history.forEach(item => {
+                const statusClass = item.status === 'Valid' ? 'valid' : 'invalid';
+                const emoji = item.status === 'Valid' ? '✅' : '❌';
+                html += `
+                    <div class="history-item">
+                        <span class="id">${item.id}</span>
+                        <span class="status ${statusClass}">${emoji} ${item.status}</span>
+                        <span class="time">${item.time}</span>
+                    </div>
+                `;
+            });
+            historyList.innerHTML = html;
+        }
+        
+        function updateStats() {
+            document.getElementById('validCount').textContent = validCount;
+            document.getElementById('invalidCount').textContent = invalidCount;
+            document.getElementById('totalCount').textContent = totalCount;
+        }
+        
+        function clearHistory() {
+            history = [];
+            validCount = 0;
+            invalidCount = 0;
+            totalCount = 0;
+            renderHistory();
+            updateStats();
+            result.classList.remove('active');
+        }
+        
+        // Auto-check from URL parameter
+        function autoCheckFromURL() {
+            const params = getURLParams();
+            const lpgid = params.lpgid;
+            
+            if (lpgid && /^\d+$/.test(lpgid)) {
+                // Show info
+                urlInfo.innerHTML = `
+                    🔗 <strong>Auto-Check:</strong> Checking LPG ID <code>${lpgid}</code> from URL
+                `;
+                
+                // Set input value
+                lpgInput.value = lpgid;
+                isAutoCheck = true;
+                
+                // Check after small delay
+                setTimeout(() => {
+                    checkLPG(lpgid);
+                }, 500);
+            } else if (lpgid) {
+                urlInfo.innerHTML = `
+                    ⚠️ <strong>Invalid LPG ID:</strong> <code>${lpgid}</code> in URL. Please enter a valid ID.
+                `;
+            } else {
+                urlInfo.innerHTML = `
+                    💡 <strong>URL Parameter:</strong> Use <code>?lpgid=20000290</code> to auto-check
+                `;
+            }
+        }
+        
+        // Initialize
+        renderHistory();
+        updateStats();
+        autoCheckFromURL();
+    </script>
+</body>
+</html>
