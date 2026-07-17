@@ -14,35 +14,51 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .container {
-            max-width: 550px;
+            max-width: 600px;
             width: 100%;
             background: white;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 28px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        h1 {
+        .header {
             text-align: center;
-            color: #333;
-            font-size: 22px;
-            margin-bottom: 4px;
+            margin-bottom: 24px;
         }
-        .subtitle {
-            text-align: center;
+        .header h1 {
+            color: #333;
+            font-size: 26px;
+            font-weight: 700;
+        }
+        .header .subtitle {
             color: #888;
-            font-size: 13px;
-            margin-bottom: 20px;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        .header .badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
         .input-group {
             display: flex;
             gap: 8px;
-            margin-bottom: 10px;
         }
         .input-group input {
             flex: 1;
@@ -50,29 +66,34 @@
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 15px;
-            transition: border-color 0.3s;
-            min-width: 0;
+            transition: all 0.3s;
+            font-family: monospace;
+            letter-spacing: 0.5px;
         }
         .input-group input:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .input-group input:disabled {
+            background: #f0f0f0;
+            cursor: not-allowed;
         }
         .input-group button {
-            padding: 10px 20px;
-            background: #667eea;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 15px;
-            cursor: pointer;
             font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s;
             white-space: nowrap;
         }
-        .input-group button:hover {
-            background: #5a6fd6;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        .input-group button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
         .input-group button:disabled {
             opacity: 0.6;
@@ -83,42 +104,67 @@
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
-            margin-bottom: 16px;
+            margin-top: 12px;
+            align-items: center;
         }
         .quick-ids span {
             color: #666;
             font-size: 12px;
-            padding: 4px 0;
+            font-weight: 500;
         }
         .quick-ids button {
             padding: 4px 12px;
-            background: #f0f0f0;
+            background: white;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
+            font-family: monospace;
             transition: all 0.2s;
+            color: #333;
         }
         .quick-ids button:hover {
             background: #667eea;
             color: white;
             border-color: #667eea;
+            transform: scale(1.05);
+        }
+        .url-hint {
+            background: #f0f4ff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #555;
+            border: 1px solid #d4e0ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .url-hint code {
+            background: #e4ecff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #667eea;
+            font-family: monospace;
         }
         .loader {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 30px 0;
         }
         .loader.active {
             display: block;
         }
         .spinner {
+            width: 45px;
+            height: 45px;
             border: 4px solid #f3f3f3;
             border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
             margin: 0 auto;
         }
         @keyframes spin {
@@ -126,27 +172,37 @@
             100% { transform: rotate(360deg); }
         }
         .loader p {
-            margin-top: 10px;
+            margin-top: 12px;
             color: #666;
             font-size: 14px;
         }
+        .loader .sub-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
         .result {
             display: none;
-            animation: fadeIn 0.4s;
+            animation: slideDown 0.4s ease;
         }
         .result.active {
             display: block;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .result-card {
-            border-radius: 10px;
-            padding: 16px;
-            border-left: 4px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 5px solid #28a745;
             background: #f8f9fa;
-            margin-top: 16px;
         }
         .result-card.invalid {
             border-left-color: #dc3545;
@@ -155,46 +211,59 @@
             border-left-color: #ffc107;
         }
         .result-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .result-title.valid { color: #28a745; }
         .result-title.invalid { color: #dc3545; }
         .result-title.error { color: #ffc107; }
+        .result-grid {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 6px 16px;
+        }
         .result-item {
-            display: flex;
-            padding: 4px 0;
-            font-size: 14px;
-            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9ecef;
+            display: contents;
+        }
+        .result-item .label {
+            color: #666;
+            font-weight: 500;
+            font-size: 13px;
+            padding: 6px 0;
             border-bottom: 1px solid #e9ecef;
         }
-        .result-item:last-child {
-            border-bottom: none;
-        }
-        .result-label {
-            color: #666;
-            min-width: 100px;
-            font-weight: 500;
-        }
-        .result-value {
+        .result-item .value {
             color: #333;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid #e9ecef;
             word-break: break-all;
         }
-        .result-value.highlight {
+        .result-item:last-child .label,
+        .result-item:last-child .value {
+            border-bottom: none;
+        }
+        .value.highlight {
             color: #28a745;
             font-weight: 600;
         }
-        .badge {
+        .value .tag {
             display: inline-block;
-            padding: 2px 10px;
+            padding: 1px 10px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
             margin-left: 6px;
         }
-        .badge.success { background: #d4edda; color: #155724; }
-        .badge.warning { background: #fff3cd; color: #856404; }
+        .tag.success { background: #d4edda; color: #155724; }
+        .tag.warning { background: #fff3cd; color: #856404; }
+        .tag.danger { background: #f8d7da; color: #721c24; }
         .stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -203,13 +272,18 @@
         }
         .stat-box {
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 10px;
             text-align: center;
+            transition: all 0.3s;
+        }
+        .stat-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
         .stat-box .number {
-            font-size: 22px;
-            font-weight: bold;
+            font-size: 26px;
+            font-weight: 700;
             color: #333;
         }
         .stat-box .label {
@@ -219,6 +293,7 @@
         }
         .stat-box.valid .number { color: #28a745; }
         .stat-box.invalid .number { color: #dc3545; }
+        .stat-box.total .number { color: #667eea; }
         .history {
             margin-top: 20px;
             border-top: 2px solid #e9ecef;
@@ -233,39 +308,64 @@
         .history-header h3 {
             color: #333;
             font-size: 16px;
+            font-weight: 600;
         }
-        .history-header button {
+        .history-header .clear-btn {
             padding: 4px 14px;
             background: #dc3545;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
+            transition: all 0.2s;
         }
-        .history-header button:hover {
+        .history-header .clear-btn:hover {
             background: #c82333;
         }
         .history-list {
-            max-height: 200px;
+            max-height: 220px;
             overflow-y: auto;
+        }
+        .history-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .history-list::-webkit-scrollbar-thumb {
+            background: #ddd;
+            border-radius: 2px;
         }
         .history-item {
             background: #f8f9fa;
             padding: 8px 12px;
             margin-bottom: 4px;
-            border-radius: 4px;
+            border-radius: 6px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .history-item:hover {
+            background: #f0f0f0;
+        }
+        .history-item.valid {
+            border-left-color: #28a745;
+        }
+        .history-item.invalid {
+            border-left-color: #dc3545;
         }
         .history-item .id {
             font-weight: 600;
             color: #333;
+            font-family: monospace;
         }
-        .history-item .status.valid { color: #28a745; font-weight: 600; }
-        .history-item .status.invalid { color: #dc3545; font-weight: 600; }
+        .history-item .status {
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .history-item .status.valid { color: #28a745; }
+        .history-item .status.invalid { color: #dc3545; }
         .history-item .time {
             color: #999;
             font-size: 11px;
@@ -273,71 +373,86 @@
         .empty-history {
             text-align: center;
             color: #999;
-            padding: 16px;
+            padding: 20px;
             font-size: 14px;
         }
-        .url-info {
-            background: #f0f4ff;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #555;
-            border: 1px solid #d4e0ff;
-        }
-        .url-info code {
-            background: #e4ecff;
+        .copy-link {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 12px;
             padding: 2px 8px;
             border-radius: 4px;
-            font-size: 12px;
-            color: #667eea;
-            word-break: break-all;
+            transition: all 0.2s;
+        }
+        .copy-link:hover {
+            background: #e4ecff;
         }
         @media (max-width: 480px) {
             .container { padding: 16px; }
             .input-group { flex-direction: column; }
             .input-group button { width: 100%; }
-            .result-item { flex-direction: column; gap: 2px; }
-            .result-label { min-width: auto; }
+            .result-grid { grid-template-columns: 1fr; gap: 2px; }
+            .result-item .label { 
+                font-weight: 600;
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+            .result-item .value {
+                padding-top: 0;
+                border-bottom: 1px solid #e9ecef;
+            }
             .stats { grid-template-columns: 1fr; }
+            .history-item { flex-wrap: wrap; gap: 4px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔥 Bharat Gas Checker</h1>
-        <p class="subtitle">Check LPG ID validity instantly</p>
-        
-        <div class="url-info" id="urlInfo">
-            💡 <strong>URL Parameter:</strong> Use <code>?lpgid=20000290</code> to auto-check
+        <div class="header">
+            <h1>🔥 Bharat Gas Checker</h1>
+            <div class="subtitle">Check LPG ID validity & consumer details</div>
+            <span class="badge">⚡ Real-time API</span>
         </div>
-        
-        <div class="input-group">
-            <input type="text" id="lpgInput" placeholder="Enter LPG ID (e.g., 20000290)" />
-            <button id="checkBtn">🔍 Check</button>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="lpgInput" placeholder="Enter LPG ID (e.g., 20000290)" autofocus />
+                <button id="checkBtn">🔍 Check</button>
+            </div>
+
+            <div class="quick-ids">
+                <span>Quick IDs:</span>
+                <button onclick="checkLPG('20000290')">20000290</button>
+                <button onclick="checkLPG('20000291')">20000291</button>
+                <button onclick="checkLPG('20000292')">20000292</button>
+                <button onclick="checkLPG('20000293')">20000293</button>
+                <button onclick="checkLPG('20000294')">20000294</button>
+                <button onclick="checkLPG('20000295')">20000295</button>
+            </div>
+
+            <div class="url-hint">
+                <span>🔗</span>
+                <span>Share link:</span>
+                <code id="shareLink">?lpgid=20000290</code>
+                <button class="copy-link" onclick="copyShareLink()">📋 Copy</button>
+            </div>
         </div>
-        
-        <div class="quick-ids">
-            <span>Quick:</span>
-            <button onclick="checkLPG('20000290')">20000290</button>
-            <button onclick="checkLPG('20000291')">20000291</button>
-            <button onclick="checkLPG('20000292')">20000292</button>
-            <button onclick="checkLPG('20000293')">20000293</button>
-            <button onclick="checkLPG('20000294')">20000294</button>
-        </div>
-        
+
         <div class="loader" id="loader">
             <div class="spinner"></div>
-            <p>Checking...</p>
+            <p>Checking LPG ID...</p>
+            <div class="sub-text">Please wait while we fetch the details</div>
         </div>
-        
+
         <div class="result" id="result">
             <div class="result-card" id="resultCard">
                 <div class="result-title" id="resultTitle"></div>
                 <div id="resultContent"></div>
             </div>
         </div>
-        
+
         <div class="stats">
             <div class="stat-box valid">
                 <div class="number" id="validCount">0</div>
@@ -347,126 +462,129 @@
                 <div class="number" id="invalidCount">0</div>
                 <div class="label">❌ Invalid</div>
             </div>
-            <div class="stat-box">
+            <div class="stat-box total">
                 <div class="number" id="totalCount">0</div>
-                <div class="label">📊 Total</div>
+                <div class="label">📊 Total Checked</div>
             </div>
         </div>
-        
+
         <div class="history">
             <div class="history-header">
                 <h3>📜 History</h3>
-                <button onclick="clearHistory()">Clear</button>
+                <button class="clear-btn" onclick="clearHistory()">🗑️ Clear</button>
             </div>
             <div class="history-list" id="historyList">
                 <div class="empty-history">No history yet</div>
             </div>
         </div>
     </div>
-    
+
     <script>
-        // Headers from your original Python code
-        const HEADERS = {
-            'User-Agent': 'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36',
-            'x-requested-with': 'XMLHttpRequest',
-            'referer': 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/Index',
-            'Cookie': 'myBharatgas:isConsentProvided=true; myBharatgas_AuthToken=Dn/0h/AMJqlH8u4P3nXKPaCIfuS5rrzeiw4ehbJQghuo/AnU1C3RFlYP1IkqLPf8yuu4lkJPAHtV8AyqlrlCuvD5n9SDnbhtY5PilGwb7tt+LKxnoNnuKgPrZcEaJGt4; ASP.NET_SessionId=t2ogzkjewegi3njisyxycuad; lang=en; __RequestVerificationToken=dkvUmeyIae99OFbOU12VeeLz2KGHKebJQ0jevpGHY83meeoyMmJGMwuXMVsZdmBWhyLsC9mk7pUwChUzu-c87dUSoWY9O9007LUCjEU4vhY1; __RequestVerificationToken_L2JoYXJhdGdhcw2=A_JsOmRFmxwZD5f-ZME0XF01nH4sDO3ZenTxl1o4dS4V_cPl_PMOO0lS8OTtcebIza0pIlIDQTlv1KAQDIQmYxdXgcRdexP29yD0ChwWtbo1; RT="z=1&dm=my.ebharatgas.com&si=a6c7fc9d-8bfd-4c08-be12-fe197fcd4cd9&ss=mo4gpv8m&sl=2&tt=r7c&rl=1&nu=1lp5jbpl&cl=5bgp&ld=5bh0&r=12g9p87h&ul=5bh1"'
+        // ============================================================
+        // 1. CONFIGURATION - Exactly like Python code
+        // ============================================================
+        const CONFIG = {
+            url: 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/ValidationConsumer',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 15) AppleWebKit/537.36',
+                'x-requested-with': 'XMLHttpRequest',
+                'referer': 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/Index',
+                'Cookie': 'myBharatgas:isConsentProvided=true; myBharatgas_AuthToken=Dn/0h/AMJqlH8u4P3nXKPaCIfuS5rrzeiw4ehbJQghuo/AnU1C3RFlYP1IkqLPf8yuu4lkJPAHtV8AyqlrlCuvD5n9SDnbhtY5PilGwb7tt+LKxnoNnuKgPrZcEaJGt4; ASP.NET_SessionId=t2ogzkjewegi3njisyxycuad; lang=en; __RequestVerificationToken=dkvUmeyIae99OFbOU12VeeLz2KGHKebJQ0jevpGHY83meeoyMmJGMwuXMVsZdmBWhyLsC9mk7pUwChUzu-c87dUSoWY9O9007LUCjEU4vhY1; __RequestVerificationToken_L2JoYXJhdGdhcw2=A_JsOmRFmxwZD5f-ZME0XF01nH4sDO3ZenTxl1o4dS4V_cPl_PMOO0lS8OTtcebIza0pIlIDQTlv1KAQDIQmYxdXgcRdexP29yD0ChwWtbo1; RT="z=1&dm=my.ebharatgas.com&si=a6c7fc9d-8bfd-4c08-be12-fe197fcd4cd9&ss=mo4gpv8m&sl=2&tt=r7c&rl=1&nu=1lp5jbpl&cl=5bgp&ld=5bh0&r=12g9p87h&ul=5bh1"'
+            },
+            captchaText: 'ET1MK2'
         };
-        
-        const URL = 'https://my.ebharatgas.com/bharatgas/UpdateContactNumber/ValidationConsumer';
-        
-        // CORS Proxy (free public proxy)
+
+        // ============================================================
+        // 2. CORS PROXIES (for browser)
+        // ============================================================
         const PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
             'https://cors-anywhere.herokuapp.com/'
         ];
-        
-        let currentProxyIndex = 0;
-        let history = [];
-        let validCount = 0;
-        let invalidCount = 0;
-        let totalCount = 0;
-        let isAutoCheck = false;
-        
-        const lpgInput = document.getElementById('lpgInput');
-        const checkBtn = document.getElementById('checkBtn');
-        const loader = document.getElementById('loader');
-        const result = document.getElementById('result');
-        const resultCard = document.getElementById('resultCard');
-        const resultTitle = document.getElementById('resultTitle');
-        const resultContent = document.getElementById('resultContent');
-        const historyList = document.getElementById('historyList');
-        const urlInfo = document.getElementById('urlInfo');
-        
-        // Get URL parameters
-        function getURLParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                lpgid: params.get('lpgid'),
-                captcha: params.get('captcha') || 'ET1MK2'
-            };
-        }
-        
-        // Enter key support
-        lpgInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkBtn.click();
-            }
-        });
-        
-        checkBtn.addEventListener('click', function() {
-            const input = lpgInput.value.trim();
-            if (!input) {
-                alert('Please enter an LPG ID');
-                return;
-            }
-            checkLPG(input);
-        });
-        
+
+        // ============================================================
+        // 3. STATE
+        // ============================================================
+        let state = {
+            history: [],
+            validCount: 0,
+            invalidCount: 0,
+            totalCount: 0,
+            currentProxy: 0,
+            isChecking: false
+        };
+
+        // ============================================================
+        // 4. DOM REFS
+        // ============================================================
+        const $ = (id) => document.getElementById(id);
+        const dom = {
+            input: $('lpgInput'),
+            checkBtn: $('checkBtn'),
+            loader: $('loader'),
+            result: $('result'),
+            resultCard: $('resultCard'),
+            resultTitle: $('resultTitle'),
+            resultContent: $('resultContent'),
+            validCount: $('validCount'),
+            invalidCount: $('invalidCount'),
+            totalCount: $('totalCount'),
+            historyList: $('historyList'),
+            shareLink: $('shareLink')
+        };
+
+        // ============================================================
+        // 5. CORE FUNCTION - checkLPG (matches Python logic)
+        // ============================================================
         function checkLPG(lpgId) {
+            // Clean input
             const idStr = String(lpgId).trim();
             
+            // Validate - must be numeric
             if (!/^\d+$/.test(idStr)) {
-                showError('Invalid ID', 'Please enter a valid numeric LPG ID');
+                showError('Invalid LPG ID', 'Please enter a valid numeric LPG ID');
                 return;
             }
-            
-            // Format to 16 digits
+
+            // Format to 16 digits with leading zeros (like Python: f"{int(lpg_id):016d}")
             const formattedId = idStr.padStart(16, '0');
-            
+
+            // Update share link
+            dom.shareLink.textContent = `?lpgid=${idStr}`;
+
             // Show loader
-            loader.classList.add('active');
-            result.classList.remove('active');
-            checkBtn.disabled = true;
-            lpgInput.disabled = true;
-            
-            // Get captcha from URL or use default
-            const params = getURLParams();
-            const captchaText = params.captcha || 'W0YHWO';
-            
-            // Build URL with parameters
-            const queryParams = new URLSearchParams({
-                'captchaText': captchaText,
+            dom.loader.classList.add('active');
+            dom.result.classList.remove('active');
+            dom.checkBtn.disabled = true;
+            dom.input.disabled = true;
+            state.isChecking = true;
+
+            // Build params (exactly like Python)
+            const params = new URLSearchParams({
+                'captchaText': CONFIG.captchaText,
                 'mobileNo': '',
                 'LPGId': formattedId,
                 'consumerNo': '',
                 'distributorCode': '',
                 '_': Date.now()
             });
-            
-            const fullUrl = `${URL}?${queryParams}`;
+
+            const fullUrl = `${CONFIG.url}?${params}`;
             
             // Try with proxy
-            makeRequestWithProxy(fullUrl, formattedId);
+            makeRequest(fullUrl, formattedId);
         }
-        
-        function makeRequestWithProxy(url, formattedId) {
-            const proxy = PROXIES[currentProxyIndex];
+
+        // ============================================================
+        // 6. REQUEST WITH PROXY
+        // ============================================================
+        function makeRequest(url, formattedId) {
+            const proxy = PROXIES[state.currentProxy];
             const proxyUrl = proxy + encodeURIComponent(url);
-            
+
             fetch(proxyUrl, {
-                headers: HEADERS
+                headers: CONFIG.headers
             })
             .then(response => {
                 if (!response.ok) {
@@ -475,183 +593,264 @@
                 return response.json();
             })
             .then(data => {
-                loader.classList.remove('active');
-                checkBtn.disabled = false;
-                lpgInput.disabled = false;
+                // Success - process result
+                dom.loader.classList.remove('active');
+                dom.checkBtn.disabled = false;
+                dom.input.disabled = false;
+                state.isChecking = false;
                 
                 processResult(formattedId, data);
             })
             .catch(error => {
                 // Try next proxy
-                if (currentProxyIndex < PROXIES.length - 1) {
-                    currentProxyIndex++;
-                    console.log(`Trying proxy ${currentProxyIndex + 1}...`);
-                    makeRequestWithProxy(url, formattedId);
+                if (state.currentProxy < PROXIES.length - 1) {
+                    state.currentProxy++;
+                    console.log(`Trying proxy ${state.currentProxy + 1}...`);
+                    makeRequest(url, formattedId);
                 } else {
-                    // All proxies failed - show error
-                    loader.classList.remove('active');
-                    checkBtn.disabled = false;
-                    lpgInput.disabled = false;
+                    // All proxies failed
+                    dom.loader.classList.remove('active');
+                    dom.checkBtn.disabled = false;
+                    dom.input.disabled = false;
+                    state.isChecking = false;
+                    
                     showError('Connection Error', 'Unable to reach server. Please try again later.');
                     console.error('All proxies failed:', error);
                 }
             });
         }
-        
+
+        // ============================================================
+        // 7. PROCESS RESULT (matches Python logic)
+        // ============================================================
         function processResult(lpgId, data) {
+            // Check if valid (like Python: data.get('IsValid'))
             if (data && data.IsValid === true) {
                 const mobile = data.MobileNumber || '';
-                const hasMobile = mobile && mobile.trim();
+                const hasMobile = mobile && mobile.trim() !== '';
                 
+                // Show valid result
                 showValidResult(lpgId, data, hasMobile);
                 
-                validCount++;
-                totalCount++;
+                // Update stats
+                state.validCount++;
+                state.totalCount++;
                 addHistory(lpgId, 'Valid');
                 
             } else if (data && data.IsValid === false) {
+                // Invalid consumer
                 showInvalidResult(lpgId);
                 
-                invalidCount++;
-                totalCount++;
+                state.invalidCount++;
+                state.totalCount++;
                 addHistory(lpgId, 'Invalid');
                 
             } else {
+                // Unexpected response
                 showError('Invalid Response', 'Unexpected response from server');
             }
             
             updateStats();
         }
-        
+
+        // ============================================================
+        // 8. UI RENDER FUNCTIONS
+        // ============================================================
         function showValidResult(lpgId, data, hasMobile) {
-            result.classList.add('active');
-            resultCard.className = 'result-card';
-            resultTitle.className = 'result-title valid';
-            resultTitle.textContent = '✅ VALID CONSUMER';
-            
+            dom.result.classList.add('active');
+            dom.resultCard.className = 'result-card';
+            dom.resultTitle.className = 'result-title valid';
+            dom.resultTitle.innerHTML = '✅ VALID CONSUMER FOUND!';
+
             const mobile = data.MobileNumber || '';
+            const mobileDisplay = mobile || 'Not Available';
+            const mobileTag = hasMobile 
+                ? '<span class="tag success">✅ Has Mobile</span>' 
+                : '<span class="tag warning">⚠️ No Mobile</span>';
+
+            let html = `
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="label">📍 LPG ID</span>
+                        <span class="value">${lpgId}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">🆔 Consumer ID</span>
+                        <span class="value">${data.ConsumerId || 'N/A'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">🔢 Consumer Number</span>
+                        <span class="value">${data.ConsumerNumber || 'N/A'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">👤 Consumer Name</span>
+                        <span class="value">${data.ConsumerName || 'N/A'}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">📞 Mobile Number</span>
+                        <span class="value ${hasMobile ? 'highlight' : ''}">${mobileDisplay} ${mobileTag}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">📧 Email ID</span>
+                        <span class="value">${data.emailId || 'Not Available'}</span>
+                    </div>
+                </div>
+            `;
             
-            let html = '';
-            html += `<div class="result-item"><span class="result-label">📍 LPG ID</span><span class="result-value">${lpgId}</span></div>`;
-            html += `<div class="result-item"><span class="result-label">🆔 Consumer ID</span><span class="result-value">${data.ConsumerId || 'N/A'}</span></div>`;
-            html += `<div class="result-item"><span class="result-label">🔢 Consumer No.</span><span class="result-value">${data.ConsumerNumber || 'N/A'}</span></div>`;
-            html += `<div class="result-item"><span class="result-label">👤 Name</span><span class="result-value">${data.ConsumerName || 'N/A'}</span></div>`;
-            html += `<div class="result-item"><span class="result-label">📞 Mobile</span><span class="result-value ${hasMobile ? 'highlight' : ''}">${mobile || 'Not Available'} ${hasMobile ? '<span class="badge success">✅ Has</span>' : '<span class="badge warning">⚠️ No</span>'}</span></div>`;
-            html += `<div class="result-item"><span class="result-label">📧 Email</span><span class="result-value">${data.emailId || 'Not Available'}</span></div>`;
-            
-            resultContent.innerHTML = html;
+            dom.resultContent.innerHTML = html;
         }
-        
+
         function showInvalidResult(lpgId) {
-            result.classList.add('active');
-            resultCard.className = 'result-card invalid';
-            resultTitle.className = 'result-title invalid';
-            resultTitle.textContent = '❌ INVALID CONSUMER';
-            
-            resultContent.innerHTML = `
-                <div class="result-item">
-                    <span class="result-label">📍 LPG ID</span>
-                    <span class="result-value">${lpgId}</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Status</span>
-                    <span class="result-value">This LPG ID does not exist or is not valid</span>
+            dom.result.classList.add('active');
+            dom.resultCard.className = 'result-card invalid';
+            dom.resultTitle.className = 'result-title invalid';
+            dom.resultTitle.innerHTML = '❌ INVALID CONSUMER';
+
+            dom.resultContent.innerHTML = `
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="label">📍 LPG ID</span>
+                        <span class="value">${lpgId}</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="label">Status</span>
+                        <span class="value">This LPG ID does not exist or is not valid</span>
+                    </div>
                 </div>
             `;
         }
-        
+
         function showError(title, message) {
-            result.classList.add('active');
-            resultCard.className = 'result-card error';
-            resultTitle.className = 'result-title error';
-            resultTitle.textContent = `⚠️ ${title}`;
-            
-            resultContent.innerHTML = `
-                <div class="result-item">
-                    <span class="result-label">Message</span>
-                    <span class="result-value">${message}</span>
+            dom.result.classList.add('active');
+            dom.resultCard.className = 'result-card error';
+            dom.resultTitle.className = 'result-title error';
+            dom.resultTitle.innerHTML = `⚠️ ${title}`;
+
+            dom.resultContent.innerHTML = `
+                <div class="result-grid">
+                    <div class="result-item">
+                        <span class="label">Message</span>
+                        <span class="value">${message}</span>
+                    </div>
                 </div>
             `;
         }
-        
+
+        // ============================================================
+        // 9. HISTORY
+        // ============================================================
         function addHistory(id, status) {
             const time = new Date().toLocaleTimeString();
-            history.unshift({ id, status, time });
-            if (history.length > 50) history.pop();
+            state.history.unshift({ id, status, time });
+            if (state.history.length > 50) state.history.pop();
             renderHistory();
         }
-        
+
         function renderHistory() {
-            if (history.length === 0) {
-                historyList.innerHTML = '<div class="empty-history">No history yet</div>';
+            if (state.history.length === 0) {
+                dom.historyList.innerHTML = '<div class="empty-history">No history yet</div>';
                 return;
             }
-            
+
             let html = '';
-            history.forEach(item => {
+            state.history.forEach(item => {
                 const statusClass = item.status === 'Valid' ? 'valid' : 'invalid';
                 const emoji = item.status === 'Valid' ? '✅' : '❌';
                 html += `
-                    <div class="history-item">
+                    <div class="history-item ${statusClass}">
                         <span class="id">${item.id}</span>
                         <span class="status ${statusClass}">${emoji} ${item.status}</span>
                         <span class="time">${item.time}</span>
                     </div>
                 `;
             });
-            historyList.innerHTML = html;
+            dom.historyList.innerHTML = html;
         }
-        
-        function updateStats() {
-            document.getElementById('validCount').textContent = validCount;
-            document.getElementById('invalidCount').textContent = invalidCount;
-            document.getElementById('totalCount').textContent = totalCount;
-        }
-        
+
         function clearHistory() {
-            history = [];
-            validCount = 0;
-            invalidCount = 0;
-            totalCount = 0;
+            state.history = [];
+            state.validCount = 0;
+            state.invalidCount = 0;
+            state.totalCount = 0;
             renderHistory();
             updateStats();
-            result.classList.remove('active');
+            dom.result.classList.remove('active');
         }
-        
-        // Auto-check from URL parameter
+
+        // ============================================================
+        // 10. STATS
+        // ============================================================
+        function updateStats() {
+            dom.validCount.textContent = state.validCount;
+            dom.invalidCount.textContent = state.invalidCount;
+            dom.totalCount.textContent = state.totalCount;
+        }
+
+        // ============================================================
+        // 11. SHARE LINK
+        // ============================================================
+        function copyShareLink() {
+            const link = dom.shareLink.textContent;
+            const fullUrl = window.location.origin + window.location.pathname + link;
+            
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                const btn = document.querySelector('.copy-link');
+                btn.textContent = '✅ Copied!';
+                setTimeout(() => btn.textContent = '📋 Copy', 2000);
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = fullUrl;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Link copied to clipboard!');
+            });
+        }
+
+        // ============================================================
+        // 12. URL PARAMETER AUTO-CHECK
+        // ============================================================
         function autoCheckFromURL() {
-            const params = getURLParams();
-            const lpgid = params.lpgid;
+            const params = new URLSearchParams(window.location.search);
+            const lpgid = params.get('lpgid');
             
             if (lpgid && /^\d+$/.test(lpgid)) {
-                // Show info
-                urlInfo.innerHTML = `
-                    🔗 <strong>Auto-Check:</strong> Checking LPG ID <code>${lpgid}</code> from URL
-                `;
-                
-                // Set input value
-                lpgInput.value = lpgid;
-                isAutoCheck = true;
-                
-                // Check after small delay
-                setTimeout(() => {
-                    checkLPG(lpgid);
-                }, 500);
-            } else if (lpgid) {
-                urlInfo.innerHTML = `
-                    ⚠️ <strong>Invalid LPG ID:</strong> <code>${lpgid}</code> in URL. Please enter a valid ID.
-                `;
-            } else {
-                urlInfo.innerHTML = `
-                    💡 <strong>URL Parameter:</strong> Use <code>?lpgid=20000290</code> to auto-check
-                `;
+                dom.input.value = lpgid;
+                dom.shareLink.textContent = `?lpgid=${lpgid}`;
+                setTimeout(() => checkLPG(lpgid), 500);
             }
         }
-        
-        // Initialize
+
+        // ============================================================
+        // 13. EVENT LISTENERS
+        // ============================================================
+        // Enter key
+        dom.input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !state.isChecking) {
+                dom.checkBtn.click();
+            }
+        });
+
+        // Check button
+        dom.checkBtn.addEventListener('click', function() {
+            const input = dom.input.value.trim();
+            if (!input) {
+                alert('Please enter an LPG ID');
+                dom.input.focus();
+                return;
+            }
+            checkLPG(input);
+        });
+
+        // ============================================================
+        // 14. INIT
+        // ============================================================
         renderHistory();
         updateStats();
         autoCheckFromURL();
+        dom.input.focus();
     </script>
 </body>
 </html>
