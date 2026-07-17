@@ -26,7 +26,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             padding: 40px;
-            max-width: 800px;
+            max-width: 850px;
             width: 100%;
             animation: fadeIn 0.5s ease;
         }
@@ -110,6 +110,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            align-items: center;
         }
 
         .example-tag {
@@ -125,6 +126,12 @@
         .example-tag:hover {
             background: #667eea;
             color: white;
+        }
+
+        .example-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-right: 5px;
         }
 
         .status-section {
@@ -221,17 +228,19 @@
             background: #f8f9fa;
             padding: 10px 14px;
             border-radius: 8px;
+            border-left: 3px solid #dee2e6;
         }
 
         .detail-item .label {
-            font-size: 12px;
+            font-size: 11px;
             color: #6c757d;
             text-transform: uppercase;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .detail-item .value {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             color: #333;
             margin-top: 4px;
@@ -246,6 +255,11 @@
         .detail-item .value.missing {
             color: #dc3545;
             font-style: italic;
+        }
+
+        .detail-item .value.mobile-found {
+            color: #28a745;
+            font-weight: 600;
         }
 
         .result-actions {
@@ -270,6 +284,14 @@
 
         .btn-secondary:hover {
             background: #5a6268;
+        }
+
+        .btn-copy {
+            background: #17a2b8;
+        }
+
+        .btn-copy:hover {
+            background: #138496;
         }
 
         .history-section {
@@ -315,6 +337,18 @@
             color: white;
         }
 
+        .badge.has-mobile {
+            background: #17a2b8;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .badge.no-mobile {
+            background: #ffc107;
+            color: #333;
+            margin-left: 4px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -335,6 +369,12 @@
             .input-group button {
                 width: 100%;
             }
+
+            .result-header {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
@@ -350,24 +390,25 @@
                 <input 
                     type="text" 
                     id="lpgInput" 
-                    placeholder="Enter LPG ID (e.g., 20000290)" 
+                    placeholder="Enter LPG ID (e.g., 20000290 or 0000000020000293)" 
                     aria-label="LPG ID Input"
                 />
                 <button id="checkBtn">🔍 Check</button>
             </div>
             <div class="example-tags">
+                <span class="example-label">Quick test:</span>
                 <span class="example-tag" onclick="setExample('20000290')">20000290</span>
                 <span class="example-tag" onclick="setExample('20000291')">20000291</span>
                 <span class="example-tag" onclick="setExample('20000292')">20000292</span>
-                <span class="example-tag" onclick="setExample('20000293')">20000293</span>
-                <span style="font-size:12px;color:#6c757d;margin-left:5px;">(Click to test)</span>
+                <span class="example-tag" onclick="setExample('0000000020000293')">0000000020000293</span>
+                <span class="example-tag" onclick="setExample('20000294')">20000294</span>
             </div>
         </div>
 
         <div class="status-section">
             <div class="loader" id="loader">
                 <div class="spinner"></div>
-                <p style="margin-top:10px;color:#6c757d;">Checking LPG ID...</p>
+                <p style="margin-top:10px;color:#6c757d;">🔍 Checking LPG ID...</p>
             </div>
 
             <div class="result-card" id="resultCard">
@@ -379,14 +420,14 @@
                     <!-- Dynamically populated -->
                 </div>
                 <div class="result-actions">
-                    <button class="btn-secondary" onclick="copyResult()">📋 Copy Details</button>
+                    <button class="btn-secondary btn-copy" onclick="copyResult()">📋 Copy Details</button>
                     <button class="btn-secondary" onclick="clearResult()">🗑️ Clear</button>
                 </div>
             </div>
         </div>
 
         <div class="history-section">
-            <h3>📜 History</h3>
+            <h3>📜 Check History</h3>
             <div class="history-list" id="historyList">
                 <p style="color:#6c757d;font-size:14px;text-align:center;">No checks performed yet</p>
             </div>
@@ -408,6 +449,7 @@
         // State
         let history = [];
         let isChecking = false;
+        let lastResult = null;
 
         // DOM elements
         const lpgInput = document.getElementById('lpgInput');
@@ -431,11 +473,24 @@
             checkLPG();
         }
 
+        // Format LPG ID to 16 digits
+        function formatLPGId(input) {
+            // Remove any non-numeric characters
+            const cleaned = input.replace(/[^0-9]/g, '');
+            if (!cleaned) return null;
+            
+            // Parse as integer and pad to 16 digits
+            const num = parseInt(cleaned);
+            if (isNaN(num) || num < 0) return null;
+            
+            return String(num).padStart(16, '0');
+        }
+
         // Main check function
         async function checkLPG() {
             const input = lpgInput.value.trim();
             if (!input) {
-                alert('Please enter an LPG ID');
+                alert('⚠️ Please enter an LPG ID');
                 return;
             }
 
@@ -448,12 +503,11 @@
             resultCard.classList.remove('active');
 
             try {
-                // Format LPG ID to 16 digits with leading zeros
-                const lpgId = parseInt(input);
-                if (isNaN(lpgId) || lpgId < 0) {
-                    throw new Error('Invalid LPG ID format');
+                // Format LPG ID
+                const formattedId = formatLPGId(input);
+                if (!formattedId) {
+                    throw new Error('Invalid LPG ID format. Please enter a valid number.');
                 }
-                const formattedId = String(lpgId).padStart(16, '0');
 
                 // Build request parameters
                 const timestamp = Date.now();
@@ -468,20 +522,29 @@
 
                 const url = `${API_URL}?${params.toString()}`;
 
+                console.log(`🔍 Checking LPG ID: ${formattedId}`);
+                console.log('=' .repeat(60));
+
                 // Make request
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: HEADERS
                 });
 
+                console.log(`📡 Status Code: ${response.status}`);
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                displayResult(data, formattedId);
+                console.log(`📦 Response Data:`, data);
+                console.log('=' .repeat(60));
+                
+                displayResult(data, formattedId, input);
 
             } catch (error) {
+                console.error('⚠️ ERROR:', error.message);
                 displayError(error.message);
             } finally {
                 loader.classList.remove('active');
@@ -491,64 +554,125 @@
         }
 
         // Display result
-        function displayResult(data, lpgId) {
+        function displayResult(data, formattedId, originalInput) {
             const isValid = data.IsValid || false;
             const mobile = data.MobileNumber || '';
-            const hasMobile = mobile && mobile.trim().length > 0;
+            const hasMobile = mobile && mobile.trim().length > 0 && mobile !== '0';
+            const consumerId = data.ConsumerId || 'N/A';
+            const consumerNumber = data.ConsumerNumber || 'N/A';
+            const consumerName = data.ConsumerName || 'N/A';
+            const emailId = data.emailId || 'Not Available';
+
+            // Store result for copying
+            lastResult = {
+                formattedId,
+                originalInput,
+                isValid,
+                consumerId,
+                consumerNumber,
+                consumerName,
+                mobile: hasMobile ? mobile : 'Not Available',
+                emailId,
+                hasMobile
+            };
 
             // Update result card
             resultCard.className = 'result-card active ' + (isValid ? 'success' : 'error');
-            resultTitle.textContent = isValid ? '✅ Valid Consumer Found!' : '❌ Invalid Consumer';
-            statusBadge.textContent = isValid ? 'VALID' : 'INVALID';
-            statusBadge.className = 'status-badge ' + (isValid ? 'success' : 'error');
+            
+            if (isValid) {
+                resultTitle.textContent = '✅ VALID CONSUMER FOUND!';
+                statusBadge.textContent = 'VALID';
+                statusBadge.className = 'status-badge success';
+            } else {
+                resultTitle.textContent = '❌ INVALID CONSUMER';
+                statusBadge.textContent = 'INVALID';
+                statusBadge.className = 'status-badge error';
+            }
 
             // Build details
             const details = [
-                { label: 'LPG ID', value: lpgId, highlight: true },
-                { label: 'Consumer ID', value: data.ConsumerId || 'N/A' },
-                { label: 'Consumer Number', value: data.ConsumerNumber || 'N/A' },
-                { label: 'Consumer Name', value: data.ConsumerName || 'N/A' },
+                { label: '📍 LPG ID', value: formattedId, icon: '📍' },
+                { label: '🆔 Consumer ID', value: consumerId, icon: '🆔' },
+                { label: '🔢 Consumer Number', value: consumerNumber, icon: '🔢' },
+                { label: '👤 Consumer Name', value: consumerName, icon: '👤' },
                 { 
-                    label: 'Mobile Number', 
+                    label: '📞 Mobile Number', 
                     value: hasMobile ? mobile : 'Not Available',
+                    icon: '📞',
                     highlight: hasMobile,
                     missing: !hasMobile
                 },
-                { label: 'Email ID', value: data.emailId || 'Not Available' }
+                { label: '📧 Email ID', value: emailId, icon: '📧' }
             ];
 
             resultDetails.innerHTML = details.map(item => `
                 <div class="detail-item">
-                    <div class="label">${item.label}</div>
-                    <div class="value ${item.highlight ? 'highlight' : ''} ${item.missing ? 'missing' : ''}">
+                    <div class="label">${item.icon} ${item.label}</div>
+                    <div class="value ${item.highlight ? 'mobile-found' : ''} ${item.missing ? 'missing' : ''}">
                         ${item.value}
                     </div>
                 </div>
             `).join('');
 
+            // Add mobile status message
+            const mobileStatus = document.createElement('div');
+            mobileStatus.style.cssText = `
+                grid-column: 1 / -1;
+                padding: 10px;
+                border-radius: 8px;
+                font-weight: 600;
+                text-align: center;
+                margin-top: 5px;
+            `;
+            
+            if (isValid) {
+                mobileStatus.textContent = hasMobile ? 
+                    '✅ This record HAS a mobile number' : 
+                    '⚠️ This record does NOT have a mobile number';
+                mobileStatus.style.background = hasMobile ? '#d4edda' : '#fff3cd';
+                mobileStatus.style.color = hasMobile ? '#155724' : '#856404';
+            } else {
+                mobileStatus.textContent = '❌ This LPG ID does not exist or is not valid';
+                mobileStatus.style.background = '#f8d7da';
+                mobileStatus.style.color = '#721c24';
+            }
+            
+            const detailsContainer = resultDetails;
+            const existingStatus = detailsContainer.querySelector('.mobile-status');
+            if (existingStatus) existingStatus.remove();
+            mobileStatus.className = 'mobile-status';
+            detailsContainer.appendChild(mobileStatus);
+
             // Add to history
-            addHistory(lpgId, isValid, hasMobile);
+            addHistory(originalInput, formattedId, isValid, hasMobile);
         }
 
         // Display error
         function displayError(message) {
             resultCard.className = 'result-card active error';
-            resultTitle.textContent = '⚠️ Error';
+            resultTitle.textContent = '⚠️ ERROR';
             statusBadge.textContent = 'ERROR';
             statusBadge.className = 'status-badge error';
 
             resultDetails.innerHTML = `
                 <div class="detail-item" style="grid-column: 1 / -1;">
-                    <div class="label">Error Message</div>
+                    <div class="label">⚠️ Error Message</div>
                     <div class="value" style="color:#dc3545;">${message}</div>
+                </div>
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                    <div class="label">💡 Tip</div>
+                    <div class="value" style="font-size:14px;color:#6c757d;">
+                        Make sure you have a stable internet connection and the LPG ID is correct.
+                    </div>
                 </div>
             `;
         }
 
         // Add to history
-        function addHistory(lpgId, isValid, hasMobile) {
+        function addHistory(originalInput, formattedId, isValid, hasMobile) {
             const entry = {
-                id: lpgId,
+                original: originalInput,
+                formatted: formattedId,
                 isValid: isValid,
                 hasMobile: hasMobile,
                 timestamp: new Date().toLocaleTimeString()
@@ -569,12 +693,17 @@
 
             historyList.innerHTML = history.map(item => `
                 <div class="history-item">
-                    <span>${item.id}</span>
+                    <span>
+                        <strong>${item.original}</strong>
+                        ${item.original !== item.formatted ? ` <span style="font-size:11px;color:#6c757d;">→ ${item.formatted}</span>` : ''}
+                    </span>
                     <span>
                         <span class="badge ${item.isValid ? 'valid' : 'invalid'}">
                             ${item.isValid ? '✅' : '❌'} ${item.isValid ? 'Valid' : 'Invalid'}
-                            ${item.isValid ? (item.hasMobile ? '📱' : '📭') : ''}
                         </span>
+                        ${item.isValid ? (item.hasMobile ? 
+                            '<span class="badge has-mobile">📱 Has Mobile</span>' : 
+                            '<span class="badge no-mobile">📭 No Mobile</span>') : ''}
                         <span style="font-size:11px;color:#6c757d;margin-left:8px;">${item.timestamp}</span>
                     </span>
                 </div>
@@ -583,15 +712,23 @@
 
         // Copy result
         function copyResult() {
-            const details = resultDetails.querySelectorAll('.detail-item');
-            let text = 'BHARAT GAS LPG CHECK RESULT\n';
-            text += '='.repeat(40) + '\n';
-            
-            details.forEach(item => {
-                const label = item.querySelector('.label')?.textContent || '';
-                const value = item.querySelector('.value')?.textContent || '';
-                text += `${label}: ${value}\n`;
-            });
+            if (!lastResult) {
+                alert('No result to copy. Please check an LPG ID first.');
+                return;
+            }
+
+            const text = `BHARAT GAS LPG CHECK RESULT
+${'='.repeat(60)}
+📍 LPG ID         : ${lastResult.formattedId}
+🆔 Consumer ID    : ${lastResult.consumerId}
+🔢 Consumer Number: ${lastResult.consumerNumber}
+👤 Consumer Name  : ${lastResult.consumerName}
+📞 Mobile Number  : ${lastResult.mobile}
+📧 Email ID       : ${lastResult.emailId}
+${'='.repeat(60)}
+${lastResult.isValid ? (lastResult.hasMobile ? '✅ This record HAS a mobile number' : '⚠️ This record does NOT have a mobile number') : '❌ This LPG ID does not exist or is not valid'}
+${'='.repeat(60)}
+Checked: ${new Date().toLocaleString()}`;
 
             navigator.clipboard.writeText(text).then(() => {
                 alert('✅ Result copied to clipboard!');
@@ -612,6 +749,7 @@
             resultCard.classList.remove('active');
             lpgInput.value = '';
             lpgInput.focus();
+            lastResult = null;
         }
 
         // Initial focus
@@ -619,6 +757,7 @@
 
         console.log('🚀 Bharat Gas LPG Checker loaded successfully!');
         console.log('ℹ️  Enter an LPG ID and click Check to verify.');
+        console.log('💡 Supports both 8-digit and 16-digit formats.');
     </script>
 </body>
 </html>
