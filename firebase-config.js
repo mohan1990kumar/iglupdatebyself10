@@ -2,19 +2,15 @@
 // Your web app's Firebase configuration
 
 const firebaseConfig = {
-
-  apiKey: "AIzaSyBDjnmlOmYEN0GvZIFLUiCqZ3lFFYeFHmg",
-  authDomain: "k811by.firebaseapp.com",
-  databaseURL: "https://k811by-default-rtdb.firebaseio.com",
-  projectId: "k811by",
-  storageBucket: "k811by.firebasestorage.app",
-  messagingSenderId: "142648329051",
-  appId: "1:142648329051:web:6b23d4d1d401bb80dc507e",
-  measurementId: "G-QF3T28YPF0"
+  apiKey: "AIzaSyCvqwVNv5QQWRuQg_wyzSfvg-_ZoSmqEqk",
+  authDomain: "goramaha2.firebaseapp.com",
+  databaseURL: "https://goramaha2-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "goramaha2",
+  storageBucket: "goramaha2.firebasestorage.app",
+  messagingSenderId: "108588578269",
+  appId: "1:108588578269:web:35b3354d5068d4f88e3234",
+  measurementId: "G-B28M95QYW3"
 };
-
-
-
 
 // initialize firebase
 firebase.initializeApp(firebaseConfig);
